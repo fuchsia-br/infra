@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Fetch the list of Fuchsia repos to sync and run a gitsync.bash for each.
+# Fetch the list of Fuchsia repos to sync and run a gitsync.sh for each.
 # Designed to be run unattended via cron job.
 
 SRC_HOST="https://fuchsia.googlesource.com"
@@ -38,7 +38,7 @@ git pull
 REPO_LIST=$(cat "${SCRIPT_DIR}"/list-of-repos.txt)
 for repo in ${REPO_LIST}; do
   echo "[gitsync] Syncing ${repo}..."
-  "${SCRIPT_DIR}"/gitsync.bash "${SRC_HOST}" "${DST_HOST}" "${repo}"
+  "${SCRIPT_DIR}"/gitsync.sh "${SRC_HOST}" "${DST_HOST}" "${repo}"
   date +%H:%M:%S
 done
 
