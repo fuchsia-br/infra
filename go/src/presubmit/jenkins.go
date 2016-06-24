@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package main
+package presubmit
 
 // This file contains all the functions that contain Jenkins-specific logic.  Other
 // files should be able to reference these functions without knowing what CI system
@@ -33,9 +33,9 @@ func getJenkins() (*jenkins.Jenkins, error) {
 	return jenkinsInstance, err
 }
 
-// lastPresubmitBuildError returns the error of the last presubmit build, or nil if the build
+// LastPresubmitBuildError returns the error of the last presubmit build, or nil if the build
 // succeeded.  It also returns an error if we fail to fetch the status of the build.
-func lastPresubmitBuildError() error {
+func LastPresubmitBuildError() error {
 	j, err := getJenkins()
 	if err != nil {
 		return err
@@ -53,16 +53,16 @@ func lastPresubmitBuildError() error {
 	return nil
 }
 
-// removeOutdatedBuilds halts and removes presubmit builds that are no longer relevant.  This
+// RemoveOutdatedBuilds halts and removes presubmit builds that are no longer relevant.  This
 // could happen because a contributor uploads a new patch set before the old one is finished testing.
-func removeOutdatedBuilds(validCLs map[clNumber]patchset) (errs []error) {
+func RemoveOutdatedBuilds(validCLs map[CLNumber]Patchset) (errs []error) {
 	fmt.Println("Removing outdated builds (if you believe this suspicious looking log message)")
 	// TODO(lanechr): everything.
 	return nil
 }
 
-// addPresubmitTestBuild actually kicks off the presubmit test build on Jenkins.
-func addPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
+// AddPresubmitTestBuild actually kicks off the presubmit test build on Jenkins.
+func AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
 	j, err := getJenkins()
 	if err != nil {
 		return err
@@ -83,10 +83,10 @@ func addPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
 	return nil
 }
 
-// getTestsToRun returns the list of tests we should run on CLs.  In the original version of this function
+// GetTestsToRun returns the list of tests we should run on CLs.  In the original version of this function
 // from V23, it loaded a config from their tooldata package and cross-checked it with a list of given projects,
 // running only the tests that were associated with those projects.  So naturally, we just hardcode a list :P
-func getTestsToRun() []string {
+func GetTestsToRun() []string {
 	// TODO(lanechr): replace this function with something that returns just the tests
 	// that are affected by the CLs we're testing.
 	return []string{

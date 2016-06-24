@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package main
+package presubmit
 
 import (
 	"reflect"
@@ -21,20 +21,20 @@ type stubWorkflow struct {
 	clsAddedForTest   []gerrit.CLList
 }
 
-func (mw *stubWorkflow) listTestsToRun() []string {
+func (mw *stubWorkflow) ListTestsToRun() []string {
 	return []string{"meow-test", "nyan-test"}
 }
 
-func (mw *stubWorkflow) removeOutdatedBuilds(outdatedCLs map[clNumber]patchset) []error {
+func (mw *stubWorkflow) RemoveOutdatedBuilds(outdatedCLs map[CLNumber]Patchset) []error {
 	return nil
 }
 
-func (mw *stubWorkflow) addPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
+func (mw *stubWorkflow) AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
 	mw.clsAddedForTest = append(mw.clsAddedForTest, cls)
 	return nil
 }
 
-func (mw *stubWorkflow) postResults(message string, clRefs []string, verified bool) error {
+func (mw *stubWorkflow) PostResults(message string, clRefs []string, verified bool) error {
 	mw.postMessageRecord = append(mw.postMessageRecord, postedResult{message, clRefs, verified})
 	return nil
 }
@@ -71,15 +71,15 @@ func TestSendCLsToPresubmitTest(t *testing.T) {
 	}
 
 	stubWorker := stubWorkflow{}
-	sender := clsSender{
-		clLists: clLists,
-		worker:  &stubWorker,
+	sender := CLsSender{
+		CLLists: clLists,
+		Worker:  &stubWorker,
 	}
-	if err := sender.sendCLsToPresubmitTest(); err != nil {
+	if err := sender.SendCLsToPresubmitTest(); err != nil {
 		t.Fatalf("sendCLsToPresubmitTest returned error: %v", err)
 	}
 
-	if got, want := sender.clsSent, 3; got != want {
+	if got, want := sender.CLsSent, 3; got != want {
 		t.Fatalf("numSentCLs: got %d, want %d", got, want)
 	}
 
