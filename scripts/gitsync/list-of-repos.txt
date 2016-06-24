@@ -1,0 +1,15 @@
+gigaboot20x6
+infra
+magenta
+manifest
+third_party/binutils-gdb
+third_party/clang
+third_party/compiler-rt
+third_party/depthcharge
+third_party/libcxx
+third_party/libcxxabi
+third_party/libunwind
+third_party/lld
+third_party/lldb
+third_party/llvm
+third_party/qemu
