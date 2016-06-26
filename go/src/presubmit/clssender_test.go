@@ -39,6 +39,10 @@ func (mw *stubWorkflow) PostResults(message string, clRefs []string, verified bo
 	return nil
 }
 
+func (mw *stubWorkflow) LastPresubmitBuildError() error {
+	return nil
+}
+
 func TestSendCLsToPresubmitTest(t *testing.T) {
 	clLists := []gerrit.CLList{
 		// Expect this to be run.

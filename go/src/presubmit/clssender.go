@@ -17,17 +17,21 @@ type Patchset int
 
 // A Workflow handles the interaction with the Continuous Integrations system.
 type Workflow interface {
-	// listTestsToRun should return a list of test names to run.
+	// ListTestsToRun should return a list of test names to run.
 	ListTestsToRun() (testNames []string)
 
-	// removeOutdatedBuilds should halt and remove all ongoing builds that are older
+	// RemoveOutdatedBuilds should halt and remove all ongoing builds that are older
 	// than the given valid ones.
 	RemoveOutdatedBuilds(validCLs map[CLNumber]Patchset) []error
 
-	// addPresubmitTestBuild should start the given tests with the given CLs.
+	// AddPresubmitTestBuild should start the given tests with the given CLs.
 	AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error
 
-	// postResults should publish message for the given refs.  Verified indicates whether
+	// LastPresubmitBuildError returns the error of the last presubmit build, or nil if the build
+	// succeeded.  It should returns an error if we fail to fetch the status of the build.
+	LastPresubmitBuildError() error
+
+	// PostResults should publish message for the given refs.  Verified indicates whether
 	// the presubmit tool believes this CL is OK to submit.
 	PostResults(message string, clRefs []string, verified bool) error
 }
@@ -41,7 +45,7 @@ type CLsSender struct {
 	Worker  Workflow
 }
 
-// sendCLstoPresubmitTest sends the set of CLLists for presubmit testing.
+// SendCLstoPresubmitTest sends the set of CLLists for presubmit testing.
 func (s *CLsSender) SendCLsToPresubmitTest() error {
 	for _, curCLList := range s.CLLists {
 		cls := combineCLList(curCLList)

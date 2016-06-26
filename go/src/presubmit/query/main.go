@@ -18,12 +18,14 @@ var (
 	repoList    string
 	logFilePath string
 	forceSend   bool
+	dryRun      bool
 )
 
 func init() {
 	flag.StringVar(&repoList, "repo", "", "Comma separated list of repos to query")
 	flag.StringVar(&logFilePath, "logfile", "/tmp/fuchsia-presubmit-log.json", "Full path of log file to use")
 	flag.BoolVar(&forceSend, "f", false, "Send all changes, even if they've already been sent")
+	flag.BoolVar(&dryRun, "n", false, "Query gerrit, log normally, but don't actually send to CI")
 }
 
 // sendNewChangesForTesting queries gerrit for new changes, where changes may be grouped into related
@@ -40,8 +42,17 @@ func sendNewChangesForTesting() error {
 		return err
 	}
 
+	// Pick a CI worker.
+	var worker presubmit.Workflow
+	if dryRun {
+		fmt.Println("Dry run (not actually sending anything to CI)")
+		worker = &DryRunCIWorker{}
+	} else {
+		worker = &JenkinsGerritCIWorker{}
+	}
+
 	// Don't send any changes if the presubmit test job is currently failing.
-	if err := presubmit.LastPresubmitBuildError(); err != nil {
+	if err := worker.LastPresubmitBuildError(); err != nil {
 		return fmt.Errorf("Refusing to test new CLs because of existing failures\n%v", err)
 	}
 
@@ -54,7 +65,7 @@ func sendNewChangesForTesting() error {
 			return err
 		}
 	} else {
-		fmt.Println("Sending all pending changes")
+		fmt.Println("Force sending all pending changes")
 	}
 
 	// Fetch pending CLs from Gerrit.
@@ -101,7 +112,7 @@ func sendNewChangesForTesting() error {
 	// Send the CLs for testing.
 	sender := presubmit.CLsSender{
 		CLLists: newCLs,
-		Worker:  &JenkinsGerritCIWorker{},
+		Worker:  worker,
 	}
 	if err := sender.SendCLsToPresubmitTest(); err != nil {
 		return err
@@ -126,8 +137,36 @@ func (jg *JenkinsGerritCIWorker) AddPresubmitTestBuild(cls gerrit.CLList, testNa
 	return presubmit.AddPresubmitTestBuild(cls, testNames)
 }
 
+func (jg *JenkinsGerritCIWorker) LastPresubmitBuildError() error {
+	return presubmit.LastPresubmitBuildError()
+}
+
 func (jg *JenkinsGerritCIWorker) PostResults(message string, clRefs []string, verified bool) error {
 	return presubmit.PostMessageToGerrit(message, clRefs, verified)
+}
+
+// DryRunCIWorker implements a workflow for clsSender that does not try to do any CI.  Useful if
+// you're not running a Jenkins instance on your localhost.
+type DryRunCIWorker struct{}
+
+func (w *DryRunCIWorker) ListTestsToRun() []string {
+	return []string{"fake-test"}
+}
+
+func (w *DryRunCIWorker) RemoveOutdatedBuilds(outdatedCLs map[presubmit.CLNumber]presubmit.Patchset) []error {
+	return nil
+}
+
+func (w *DryRunCIWorker) AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
+	return nil
+}
+
+func (w *DryRunCIWorker) LastPresubmitBuildError() error {
+	return nil
+}
+
+func (w *DryRunCIWorker) PostResults(message string, clRefs []string, verified bool) error {
+	return nil
 }
 
 func main() {
