@@ -9,6 +9,7 @@ package presubmit
 // is backing them.  No other files should even mention Jenkins.
 
 import (
+	"flag"
 	"fmt"
 	"net/url"
 	"strings"
@@ -19,9 +20,13 @@ import (
 
 var (
 	jenkinsHost              = "http://localhost:8090/jenkins"
-	jenkinsPresubmitTestName = "mojo-presubmit-test"
+	jenkinsPresubmitTestName string
 	jenkinsInstance          *jenkins.Jenkins
 )
+
+func init() {
+	flag.StringVar(&jenkinsPresubmitTestName, "test", "presubmit-test", "The name of the presubmit test job")
+}
 
 // getJenkins returns a handle to the Jenkins instance in a non-thread-safe singleton fashion.
 func getJenkins() (*jenkins.Jenkins, error) {
@@ -56,7 +61,6 @@ func LastPresubmitBuildError() error {
 // RemoveOutdatedBuilds halts and removes presubmit builds that are no longer relevant.  This
 // could happen because a contributor uploads a new patch set before the old one is finished testing.
 func RemoveOutdatedBuilds(validCLs map[CLNumber]Patchset) (errs []error) {
-	fmt.Println("Removing outdated builds (if you believe this suspicious looking log message)")
 	// TODO(lanechr): everything.
 	return nil
 }
