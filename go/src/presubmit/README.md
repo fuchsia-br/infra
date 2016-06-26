@@ -5,24 +5,26 @@ testing them against some CI system (currently Jenkins.)
 # Building
 Build these tools using `go build`.
 
-There is no integration with an overall build system or checkout system (yet.)
-For now, you will have to meet the dependency on `v.io/jiri` manually and set
-your `GOPATH` accordingly.
+These tools depend on the `v.io/jiri` package, which can be met by syncing
+`https://vanadium.googlesource.com/release.go.jiri`.  If you use `jiri` to sync
+Fuchsia, this repo will be checked out for you automatically under
+`$WORKDIR/release`, where `$WORKDIR` contains your `.jiri_root`.
 
-We expect this tool to be built and run automatically on the CI system.
+We expect these tool to be built and run automatically on the CI system.
 
 # Build example
 Given the following directory structure:
 
 ```
-/work/infra/go/src/presubmit/...
-/work/v23/release/go/src/v.io/...
+$WORKDIR/.jiri_root/...
+$WORKDIR/infra/go/src/presubmit/...
+$WORKDIR/release/go/src/v.io/jiri/...
 ```
 
 These commands would work, and will generate tools in your current directory.
 
 ```
-$ export GOPATH=/work/infra/go/:/work/v23/release/go
+$ export GOPATH=$WORKDIR/infra/go/:$WORKDIR/release/go
 $ go build presubmit/query
 $ go build presubmit/patch
 ```
@@ -30,22 +32,23 @@ $ go build presubmit/patch
 # Running
 The presubmit logic is organized into two different tools: `query` and `patch`.
 
-`query` checks Gerrit for new CLs and sends them to CI for testing.
-`patch` is used by CI to patch the given CLs into its code tree.
+* `query` checks Gerrit for new CLs and sends them to CI for testing.
+* `patch` is used by CI to patch the given CLs into its code tree.
 
 ## query
-Running `query` directly with no arguments will cause it to inspect
-`mojo.googlesource.com` for new CLs and send those refs to a Jenkins instance on
+`query` requires at least one argument: the gerrit host to query.  Running
+`query -gerrit https://fuchsia-review.googlesource.com` will look for new CLs
+in the Fuchsia repositories and send those refs to a Jenkins instance on
 localhost for testing.
 
-There's a fair amount of configuration expected on the Jenkins instance; in
-particular that there exists a matrix configuration build named
-`mojo-presubmit-test` that expects parameters in the form of `REFS` and `TESTS`
-(the CLs to apply and the tests to run, respectively.)
+The job to which those CLs are sent can be configured with the `-test` argument.
+The job must expect parameters in the form of `REFS` and `TESTS`, which are the
+CLs to apply and the tests to run, repsectively.
 
-The mojo assumption is temporary, and this tool will soon be parameterized to
-work for all of our projects.
+See `query -h` for more options.
 
 ## patch
-Internally, the CI jobs will use `presubmit/patch` to take the CLs given and
+Internally, the CI jobs can use `presubmit/patch` to take the CLs given and
 patch its code tree before building and running tests.
+
+See `patch -h` for more options.
