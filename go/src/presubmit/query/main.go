@@ -8,17 +8,20 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"presubmit"
 	"v.io/jiri/gerrit"
 )
 
 var (
+	repoList    string
 	logFilePath string
 	forceSend   bool
 )
 
 func init() {
+	flag.StringVar(&repoList, "repo", "", "Comma separated list of repos to query")
 	flag.StringVar(&logFilePath, "logfile", "/tmp/fuchsia-presubmit-log.json", "Full path of log file to use")
 	flag.BoolVar(&forceSend, "f", false, "Send all changes, even if they've already been sent")
 }
@@ -55,20 +58,37 @@ func sendNewChangesForTesting() error {
 	}
 
 	// Fetch pending CLs from Gerrit.
-	curCLs, err := gerritHandle.Query(presubmit.GerritQuery)
+	pendingCLs, err := gerritHandle.Query(presubmit.GerritQuery)
 	if err != nil {
 		return err
 	}
 
+	// Filter the list of CLs by repo.
+	var filteredCLs gerrit.CLList
+	if len(repoList) != 0 {
+		repoFilterList := map[string]bool{}
+		for _, repo := range strings.Split(repoList, ",") {
+			repoFilterList[repo] = true
+		}
+
+		for _, cl := range pendingCLs {
+			if repoFilterList[cl.Project] {
+				filteredCLs = append(filteredCLs, cl)
+			}
+		}
+	} else {
+		filteredCLs = pendingCLs
+	}
+
 	// Write the current list of pending CLs to a file.
-	err = gerrit.WriteLog(logFilePath, curCLs)
+	err = gerrit.WriteLog(logFilePath, filteredCLs)
 	if err != nil {
 		return err
 	}
 
 	// Compare the previous CLs to the current list to determine which new CLs we must
 	// send for testing.
-	newCLs, errList := gerrit.NewOpenCLs(prevCLsMap, curCLs)
+	newCLs, errList := gerrit.NewOpenCLs(prevCLsMap, filteredCLs)
 	errMsg := ""
 	for _, e := range errList {
 		// NewOpenCLs may return errors detected when parsing MultiPart CL metadata.
