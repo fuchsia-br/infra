@@ -5,6 +5,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -13,8 +14,14 @@ import (
 )
 
 var (
-	logFilePath = "/tmp/mojo_presubmit_log.json"
+	logFilePath string
+	forceSend   bool
 )
+
+func init() {
+	flag.StringVar(&logFilePath, "logfile", "/tmp/fuchsia-presubmit-log.json", "Full path of log file to use")
+	flag.BoolVar(&forceSend, "f", false, "Send all changes, even if they've already been sent")
+}
 
 // sendNewChangesForTesting queries gerrit for new changes, where changes may be grouped into related
 // sets that must be tested together (i.e. MultiPart changes.), then sends them for testing.
@@ -36,10 +43,15 @@ func sendNewChangesForTesting() error {
 	}
 
 	// Read previously found CLs.
-	fmt.Println("Using CL log: ", logFilePath)
-	prevCLsMap, err := gerrit.ReadLog(logFilePath)
-	if err != nil {
-		return err
+	var prevCLsMap gerrit.CLRefMap
+	if !forceSend {
+		fmt.Println("Using CL log:", logFilePath)
+		prevCLsMap, err = gerrit.ReadLog(logFilePath)
+		if err != nil {
+			return err
+		}
+	} else {
+		fmt.Println("Sending all pending changes")
 	}
 
 	// Fetch pending CLs from Gerrit.
@@ -99,6 +111,8 @@ func (jg *JenkinsGerritCIWorker) PostResults(message string, clRefs []string, ve
 }
 
 func main() {
+	flag.Parse()
+
 	if err := sendNewChangesForTesting(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
