@@ -32,7 +32,13 @@ func init() {
 func splitRef(ref string) (changelist int, patchset int, e error) {
 	parts := strings.Split(ref, "/")
 	if len(parts) != 2 {
-		return 0, 0, fmt.Errorf("malformed cl string: %q; expected the form change/patchset (like '1153/2')\n", ref)
+		// Allow for ref strings in the form of a gerrit reference.
+		if strings.HasPrefix(ref, "refs/changes/") && len(parts) == 5 {
+			parts = parts[3:]
+		} else {
+			return 0, 0, fmt.Errorf(
+				"malformed cl string: %q; examples of supported forms are: 'refs/changes/53/1153/2', or '1153/2'\n", ref)
+		}
 	}
 	changelist, e = strconv.Atoi(parts[0])
 	if e != nil {
