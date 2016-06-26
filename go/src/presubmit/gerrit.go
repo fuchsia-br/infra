@@ -5,20 +5,29 @@
 package presubmit
 
 import (
+	"flag"
 	"fmt"
-	"os"
 	"net/url"
+	"os"
 	"v.io/jiri/gerrit"
 	"v.io/jiri/runutil"
 )
 
 var (
-	gerritURL   = "https://mojo-review.googlesource.com"
+	gerritURL   string
 	GerritQuery = "status:open"
 )
 
+func init() {
+	flag.StringVar(&gerritURL, "gerrit", "", "The Gerrit endpoint, e.g. https://foo-review.googlesource.com")
+}
+
 // CreateGerrit returns a handle to our gerrit instance.
 func CreateGerrit() (*gerrit.Gerrit, error) {
+	if len(gerritURL) == 0 {
+		return nil, fmt.Errorf("No gerrit host to query; use the -gerrit flag")
+	}
+
 	// v.io/jiri/gerrit executes its commands through a v.io/jiri/runutil.Sequence object.
 	//
 	// runutil.Sequence contains environment variables, provides a place to override
