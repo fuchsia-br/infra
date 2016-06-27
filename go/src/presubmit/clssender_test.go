@@ -13,7 +13,7 @@ import (
 type postedResult struct {
 	message  string
 	refs     []string
-	verified bool
+	verified VerifiedScore
 }
 
 type stubWorkflow struct {
@@ -30,8 +30,12 @@ func (mw *stubWorkflow) AddPresubmitTestBuild(cls gerrit.CLList) error {
 	return nil
 }
 
-func (mw *stubWorkflow) PostResults(message string, clRefs []string, verified bool) error {
-	mw.postMessageRecord = append(mw.postMessageRecord, postedResult{message, clRefs, verified})
+func (mw *stubWorkflow) PostResults(message string, changes gerrit.CLList, score VerifiedScore) error {
+	clRefs := []string{}
+	for _, cl := range changes {
+		clRefs = append(clRefs, cl.Reference())
+	}
+	mw.postMessageRecord = append(mw.postMessageRecord, postedResult{message, clRefs, score})
 	return nil
 }
 
@@ -89,15 +93,15 @@ func TestSendCLsToPresubmitTest(t *testing.T) {
 	}
 
 	expectedPostedResults := []postedResult{
-		postedResult{"Change was sent for presubmit testing.  Please stand by.\n", []string{"refs/changes/xx/1000/1"}, false},
-		postedResult{"Presubmit tests skipped.\n", []string{"refs/changes/xx/2000/1"}, true},
-		postedResult{"Tell Freenode#fuchsia to kick the presubmit tests.\n", []string{"refs/changes/xx/2010/1"}, false},
-		postedResult{"Change was sent for presubmit testing.  Please stand by.\n", []string{"refs/changes/xx/1001/1", "refs/changes/xx/1002/1"}, false},
+		postedResult{"Change was sent for presubmit testing.  Please stand by.\n", []string{"refs/changes/xx/1000/1"}, VerifiedNeutral},
+		postedResult{"Presubmit tests skipped.\n", []string{"refs/changes/xx/2000/1"}, VerifiedPass},
+		postedResult{"Tell Freenode#fuchsia to kick the presubmit tests.\n", []string{"refs/changes/xx/2010/1"}, VerifiedFail},
+		postedResult{"Change was sent for presubmit testing.  Please stand by.\n", []string{"refs/changes/xx/1001/1", "refs/changes/xx/1002/1"}, VerifiedNeutral},
 		postedResult{"Tell Freenode#fuchsia to kick the presubmit tests.\n", []string{
 			"refs/changes/xx/1003/1",
 			"refs/changes/xx/1004/1",
 			"refs/changes/xx/1005/1",
-		}, false},
+		}, VerifiedFail},
 	}
 	if !reflect.DeepEqual(expectedPostedResults, stubWorker.postMessageRecord) {
 		t.Fatalf("posted messages: got %v, want %v", stubWorker.postMessageRecord, expectedPostedResults)

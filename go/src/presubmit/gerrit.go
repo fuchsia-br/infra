@@ -9,6 +9,9 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strconv"
+	"strings"
+
 	"v.io/jiri/gerrit"
 	"v.io/jiri/runutil"
 )
@@ -43,23 +46,62 @@ func CreateGerrit() (*gerrit.Gerrit, error) {
 	return gerrit.New(seq, u), nil
 }
 
-// Post the given message to the given list of refs on Gerrit.
-func PostMessageToGerrit(message string, refs []string, success bool) error {
-	fmt.Printf("Posting message to Gerrit (%v::%v) %q\n", success, refs, message)
+type VerifiedScore int
+
+const (
+	VerifiedFail    VerifiedScore = -1
+	VerifiedNeutral VerifiedScore = 0
+	VerifiedPass    VerifiedScore = 1
+)
+
+// CLListToString converts a gerrit.CLList to a string for making of nice logging.
+func CLListToString(cls gerrit.CLList) string {
+	clRefs := []string{}
+	for _, cl := range cls {
+		parts := strings.Split(cl.Reference(), "/")
+		if len(parts) != 5 {
+			return "????/?"
+		}
+		clRefs = append(clRefs, fmt.Sprintf("%s/%s", parts[3], parts[4]))
+	}
+	return strings.Join(clRefs, ", ")
+}
+
+// PostReviewFunction interface matches gerrit.PostReview, useful for injecting stub/mock functions.
+type PostReviewFunction func(ref string, msg string, labels map[string]string) error
+
+// Post the given message to the given list of changes on Gerrit.
+func PostMessageToGerrit(message string, changes gerrit.CLList, score VerifiedScore) error {
 	g, err := CreateGerrit()
 	if err != nil {
 		return err
 	}
+	return InternalPostMessageToGerrit(message, changes, score,
+		func(ref string, msg string, labels map[string]string) error {
+			return g.PostReview(ref, msg, labels)
+		})
+}
 
-	// For all the given refs, post a review with the given message.
-	for _, ref := range refs {
-		if err = g.PostReview(ref, message, nil); err != nil {
+// InternalPostMessageToGerrit handles the logic of setting the verified label and printing output.
+// It's useful for this to be separate; during dry runs we pass a stubbed out PostReviewFunction.
+func InternalPostMessageToGerrit(message string, changes gerrit.CLList, score VerifiedScore, postReview PostReviewFunction) error {
+	// For all the given changes, post a review with the given message.
+	for _, cl := range changes {
+
+		// If the change uses the Verified label, set that according to the given score.
+		// Some repos aren't set up to expect Verified, so we have to check first.
+		var labels map[string]string
+		scoreString := "N/A"
+		if _, ok := cl.Labels["Verified"]; ok {
+			scoreString = strconv.Itoa(int(score))
+			labels = map[string]string{"Verified": scoreString}
+		}
+
+		fmt.Printf("Posting message to Gerrit (%v) %q; Verified: %s\n", CLListToString(changes), message, scoreString)
+		if err := postReview(cl.Reference(), message, labels); err != nil {
 			return err
 		}
 	}
-
-	// TODO(lanechr): Set the Verified label.  Can't do this until the Gerrit repos are
-	// configured to expect it.  Need to look at v23 repos as an example.
 
 	return nil
 }

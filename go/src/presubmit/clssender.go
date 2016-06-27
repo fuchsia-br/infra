@@ -28,9 +28,9 @@ type Workflow interface {
 	// properly, or if it fails to fetch the status of the last build.
 	CheckPresubmitBuildConfig() error
 
-	// PostResults should publish message for the given refs.  Verified indicates whether
-	// the presubmit tool believes this CL is OK to submit.
-	PostResults(message string, clRefs []string, verified bool) error
+	// PostResults should publish message for the given changes.  The score indicates
+	// what `verified` score to assign.  Select from: Verified{Fail,Neutral,Pass}.
+	PostResults(message string, changes gerrit.CLList, score VerifiedScore) error
 }
 
 // CLsSender handles the workflow and business logic of sending groups of related CLs
@@ -45,39 +45,41 @@ type CLsSender struct {
 // SendCLstoPresubmitTest sends the set of CLLists for presubmit testing.
 func (s *CLsSender) SendCLsToPresubmitTest() error {
 	for _, curCLList := range s.CLLists {
-		cls := combineCLList(curCLList)
-		if len(cls.clMap) == 0 {
+		multiPartCl := combineCLList(curCLList)
+		if len(multiPartCl.clMap) == 0 {
 			fmt.Println("Skipping empty CL set")
 			continue
 		}
 
 		// Don't send the CLs to presubmit-test if at least one of them have PresubmitTest: none.
-		if cls.skipPresubmitTest {
-			fmt.Printf("Skipping %s because presubmit=none\n", cls.clString)
-			if err := s.Worker.PostResults("Presubmit tests skipped.\n", cls.refs, true); err != nil { // Verified +1
+		if multiPartCl.skipPresubmitTest {
+			fmt.Printf("Skipping %s because presubmit=none\n", multiPartCl.clString)
+			if err := s.Worker.PostResults(
+				"Presubmit tests skipped.\n", multiPartCl.changes, VerifiedPass); err != nil {
 				return err
 			}
 			continue
 		}
 
 		// Only test code submitted by trusted contributors.
-		if !cls.hasTrustedOwner {
-			fmt.Printf("Skipping %s because the owner is an external contributor\n", cls.clString)
-			if err := s.Worker.PostResults("Tell Freenode#fuchsia to kick the presubmit tests.\n", cls.refs, false); err != nil {
+		if !multiPartCl.hasTrustedOwner {
+			fmt.Printf("Skipping %s because the owner is an external contributor\n", multiPartCl.clString)
+			if err := s.Worker.PostResults(
+				"Tell Freenode#fuchsia to kick the presubmit tests.\n", multiPartCl.changes, VerifiedFail); err != nil {
 				return err
 			}
 			continue
 		}
 
 		// Cancel any previous tests from old patch sets that may still be running.
-		for _, err := range s.Worker.RemoveOutdatedBuilds(cls.clMap) {
+		for _, err := range s.Worker.RemoveOutdatedBuilds(multiPartCl.clMap) {
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err) // Not fatal; just log errors.
 			}
 		}
 
 		// Finally send the CLs to presubmit-test.
-		fmt.Printf("Sending %s to presubmit test\n", cls.clString)
+		fmt.Printf("Sending %s to presubmit test\n", multiPartCl.clString)
 		if err := s.Worker.AddPresubmitTestBuild(curCLList); err != nil {
 			fmt.Fprintf(os.Stderr, "addPresubmitTestBuild failed: %v\n", err)
 		} else {
@@ -85,7 +87,8 @@ func (s *CLsSender) SendCLsToPresubmitTest() error {
 		}
 
 		// Notify the author that their change(s) have been sent for presubmit testing.
-		if err := s.Worker.PostResults("Change was sent for presubmit testing.  Please stand by.\n", cls.refs, false); err != nil {
+		if err := s.Worker.PostResults(
+			"Change was sent for presubmit testing.  Please stand by.\n", multiPartCl.changes, VerifiedNeutral); err != nil {
 			return err
 		}
 	}
@@ -100,7 +103,7 @@ type multiPartCLInfo struct {
 	clString          string
 	skipPresubmitTest bool
 	hasTrustedOwner   bool
-	refs              []string
+	changes           gerrit.CLList
 }
 
 // combineCLList combines the given individual CLs into a single multiPartCLInfo.
@@ -130,7 +133,7 @@ func combineCLList(curCLList gerrit.CLList) multiPartCLInfo {
 
 		clStrings = append(clStrings, formatCLString(cl, ps))
 		result.clMap[CLNumber(cl)] = Patchset(ps)
-		result.refs = append(result.refs, curCL.Reference())
+		result.changes = append(result.changes, curCL)
 	}
 
 	result.clString = strings.Join(clStrings, ", ")

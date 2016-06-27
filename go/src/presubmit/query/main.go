@@ -45,7 +45,7 @@ func sendNewChangesForTesting() error {
 	// Pick a CI worker.
 	var worker presubmit.Workflow
 	if dryRun {
-		fmt.Println("Dry run (not actually sending anything to CI)")
+		fmt.Println("DRY RUN (will not send anything to CI, or write to Gerrit)")
 		worker = &DryRunCIWorker{}
 	} else {
 		worker = &JenkinsGerritCIWorker{}
@@ -139,8 +139,8 @@ func (jg *JenkinsGerritCIWorker) CheckPresubmitBuildConfig() error {
 	return presubmit.CheckPresubmitBuildConfig()
 }
 
-func (jg *JenkinsGerritCIWorker) PostResults(message string, clRefs []string, verified bool) error {
-	return presubmit.PostMessageToGerrit(message, clRefs, verified)
+func (jg *JenkinsGerritCIWorker) PostResults(message string, changes gerrit.CLList, score presubmit.VerifiedScore) error {
+	return presubmit.PostMessageToGerrit(message, changes, score)
 }
 
 // DryRunCIWorker implements a workflow for clsSender that does not try to do any CI.  Useful if
@@ -159,9 +159,11 @@ func (w *DryRunCIWorker) CheckPresubmitBuildConfig() error {
 	return nil
 }
 
-func (w *DryRunCIWorker) PostResults(message string, clRefs []string, verified bool) error {
-	fmt.Printf("[DRY RUN] Would send to Gerrit: %q (%s) Verified: %v\n", message, strings.Join(clRefs, ", "), verified)
-	return nil
+func (w *DryRunCIWorker) PostResults(message string, changes gerrit.CLList, score presubmit.VerifiedScore) error {
+	return presubmit.InternalPostMessageToGerrit(message, changes, score,
+		func(ref string, msg string, labels map[string]string) error {
+			return nil
+		})
 }
 
 func main() {
