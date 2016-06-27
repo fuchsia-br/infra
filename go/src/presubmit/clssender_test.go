@@ -89,8 +89,10 @@ func TestSendCLsToPresubmitTest(t *testing.T) {
 	}
 
 	expectedPostedResults := []postedResult{
+		postedResult{"Change was sent for presubmit testing.  Please stand by.\n", []string{"refs/changes/xx/1000/1"}, false},
 		postedResult{"Presubmit tests skipped.\n", []string{"refs/changes/xx/2000/1"}, true},
 		postedResult{"Tell Freenode#fuchsia to kick the presubmit tests.\n", []string{"refs/changes/xx/2010/1"}, false},
+		postedResult{"Change was sent for presubmit testing.  Please stand by.\n", []string{"refs/changes/xx/1001/1", "refs/changes/xx/1002/1"}, false},
 		postedResult{"Tell Freenode#fuchsia to kick the presubmit tests.\n", []string{
 			"refs/changes/xx/1003/1",
 			"refs/changes/xx/1004/1",

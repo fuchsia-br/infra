@@ -46,6 +46,20 @@ func CreateGerrit() (*gerrit.Gerrit, error) {
 // Post the given message to the given list of refs on Gerrit.
 func PostMessageToGerrit(message string, refs []string, success bool) error {
 	fmt.Printf("Posting message to Gerrit (%v::%v) %q\n", success, refs, message)
-	// TODO(lanechr): everything.
+	g, err := CreateGerrit()
+	if err != nil {
+		return err
+	}
+
+	// For all the given refs, post a review with the given message.
+	for _, ref := range refs {
+		if err = g.PostReview(ref, message, nil); err != nil {
+			return err
+		}
+	}
+
+	// TODO(lanechr): Set the Verified label.  Can't do this until the Gerrit repos are
+	// configured to expect it.  Need to look at v23 repos as an example.
+
 	return nil
 }

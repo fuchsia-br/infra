@@ -160,6 +160,7 @@ func (w *DryRunCIWorker) CheckPresubmitBuildConfig() error {
 }
 
 func (w *DryRunCIWorker) PostResults(message string, clRefs []string, verified bool) error {
+	fmt.Printf("[DRY RUN] Would send to Gerrit: %q (%s) Verified: %v\n", message, strings.Join(clRefs, ", "), verified)
 	return nil
 }
 

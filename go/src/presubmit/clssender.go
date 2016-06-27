@@ -83,6 +83,11 @@ func (s *CLsSender) SendCLsToPresubmitTest() error {
 		} else {
 			s.CLsSent += len(curCLList)
 		}
+
+		// Notify the author that their change(s) have been sent for presubmit testing.
+		if err := s.Worker.PostResults("Change was sent for presubmit testing.  Please stand by.\n", cls.refs, false); err != nil {
+			return err
+		}
 	}
 	return nil
 }
