@@ -73,7 +73,7 @@ func AddPresubmitTestBuild(cls gerrit.CLList) error {
 	}
 
 	if err := j.AddBuildWithParameter(jenkinsPresubmitTestName, url.Values{
-		"REFS":  {strings.Join(refs, " ")},
+		"REFS":  {strings.Join(refs, ",")},  // The presubmit test must expect comma-separated refs.
 	}); err != nil {
 		return err
 	}
