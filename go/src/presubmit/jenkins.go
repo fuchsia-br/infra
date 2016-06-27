@@ -65,8 +65,8 @@ func RemoveOutdatedBuilds(validCLs map[CLNumber]Patchset) (errs []error) {
 	return nil
 }
 
-// AddPresubmitTestBuild actually kicks off the presubmit test build on Jenkins.
-func AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
+// AddPresubmitTestBuild kicks off the presubmit test build on Jenkins.
+func AddPresubmitTestBuild(cls gerrit.CLList) error {
 	j, err := getJenkins()
 	if err != nil {
 		return err
@@ -79,24 +79,9 @@ func AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
 
 	if err := j.AddBuildWithParameter(jenkinsPresubmitTestName, url.Values{
 		"REFS":  {strings.Join(refs, " ")},
-		"TESTS": {strings.Join(testNames, " ")},
 	}); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// GetTestsToRun returns the list of tests we should run on CLs.  In the original version of this function
-// from V23, it loaded a config from their tooldata package and cross-checked it with a list of given projects,
-// running only the tests that were associated with those projects.  So naturally, we just hardcode a list :P
-func GetTestsToRun() []string {
-	// TODO(lanechr): replace this function with something that returns just the tests
-	// that are affected by the CLs we're testing.
-	return []string{
-		"ignore-mojo-linux-debug",
-		"ignore-mojo-linux-release",
-		"ignore-mojo-linux-asan-debug",
-		"ignore-mojo-linux-asan-release",
-	}
 }

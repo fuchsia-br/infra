@@ -125,16 +125,12 @@ func sendNewChangesForTesting() error {
 // JenkinsGerritCIWorker implements a workflow for clsSender with jenkins as CI and gerrit for code review.
 type JenkinsGerritCIWorker struct{}
 
-func (jg *JenkinsGerritCIWorker) ListTestsToRun() []string {
-	return presubmit.GetTestsToRun()
-}
-
 func (jg *JenkinsGerritCIWorker) RemoveOutdatedBuilds(outdatedCLs map[presubmit.CLNumber]presubmit.Patchset) []error {
 	return presubmit.RemoveOutdatedBuilds(outdatedCLs)
 }
 
-func (jg *JenkinsGerritCIWorker) AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
-	return presubmit.AddPresubmitTestBuild(cls, testNames)
+func (jg *JenkinsGerritCIWorker) AddPresubmitTestBuild(cls gerrit.CLList) error {
+	return presubmit.AddPresubmitTestBuild(cls)
 }
 
 func (jg *JenkinsGerritCIWorker) LastPresubmitBuildError() error {
@@ -149,15 +145,11 @@ func (jg *JenkinsGerritCIWorker) PostResults(message string, clRefs []string, ve
 // you're not running a Jenkins instance on your localhost.
 type DryRunCIWorker struct{}
 
-func (w *DryRunCIWorker) ListTestsToRun() []string {
-	return []string{"fake-test"}
-}
-
 func (w *DryRunCIWorker) RemoveOutdatedBuilds(outdatedCLs map[presubmit.CLNumber]presubmit.Patchset) []error {
 	return nil
 }
 
-func (w *DryRunCIWorker) AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
+func (w *DryRunCIWorker) AddPresubmitTestBuild(cls gerrit.CLList) error {
 	return nil
 }
 

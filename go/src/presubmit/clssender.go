@@ -17,15 +17,12 @@ type Patchset int
 
 // A Workflow handles the interaction with the Continuous Integrations system.
 type Workflow interface {
-	// ListTestsToRun should return a list of test names to run.
-	ListTestsToRun() (testNames []string)
-
 	// RemoveOutdatedBuilds should halt and remove all ongoing builds that are older
 	// than the given valid ones.
 	RemoveOutdatedBuilds(validCLs map[CLNumber]Patchset) []error
 
-	// AddPresubmitTestBuild should start the given tests with the given CLs.
-	AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error
+	// AddPresubmitTestBuild should start the presubmit tests with the given CLs.
+	AddPresubmitTestBuild(cls gerrit.CLList) error
 
 	// LastPresubmitBuildError returns the error of the last presubmit build, or nil if the build
 	// succeeded.  It should returns an error if we fail to fetch the status of the build.
@@ -63,18 +60,6 @@ func (s *CLsSender) SendCLsToPresubmitTest() error {
 			continue
 		}
 
-		// Fetch the list of tests we want to run.
-		tests := s.Worker.ListTestsToRun()
-
-		// Skip if there are no tests.
-		if len(tests) == 0 {
-			fmt.Printf("Skipping %s because no tests found\n", cls.clString)
-			if err := s.Worker.PostResults("No tests found.\n", cls.refs, true); err != nil { // Verified +1
-				return err
-			}
-			continue
-		}
-
 		// Only test code submitted by trusted contributors.
 		if !cls.hasTrustedOwner {
 			fmt.Printf("Skipping %s because the owner is an external contributor\n", cls.clString)
@@ -93,7 +78,7 @@ func (s *CLsSender) SendCLsToPresubmitTest() error {
 
 		// Finally send the CLs to presubmit-test.
 		fmt.Printf("Sending %s to presubmit test\n", cls.clString)
-		if err := s.Worker.AddPresubmitTestBuild(curCLList, tests); err != nil {
+		if err := s.Worker.AddPresubmitTestBuild(curCLList); err != nil {
 			fmt.Fprintf(os.Stderr, "addPresubmitTestBuild failed: %v\n", err)
 		} else {
 			s.CLsSent += len(curCLList)

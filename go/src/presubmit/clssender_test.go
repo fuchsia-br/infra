@@ -21,15 +21,11 @@ type stubWorkflow struct {
 	clsAddedForTest   []gerrit.CLList
 }
 
-func (mw *stubWorkflow) ListTestsToRun() []string {
-	return []string{"meow-test", "nyan-test"}
-}
-
 func (mw *stubWorkflow) RemoveOutdatedBuilds(outdatedCLs map[CLNumber]Patchset) []error {
 	return nil
 }
 
-func (mw *stubWorkflow) AddPresubmitTestBuild(cls gerrit.CLList, testNames []string) error {
+func (mw *stubWorkflow) AddPresubmitTestBuild(cls gerrit.CLList) error {
 	mw.clsAddedForTest = append(mw.clsAddedForTest, cls)
 	return nil
 }
