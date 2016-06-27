@@ -52,17 +52,6 @@ func splitRef(ref string) (changelist int, patchset int, e error) {
 	return
 }
 
-// gerritProjectToJiriProject takes the name of a project in gerrit/gob and returns the corresponding
-// project name as expressed in our jiri manifests.  v23 handles this through the policy that the
-// names must be equal, but we don't have a plan for this yet.
-func gerritProjectToJiriProject(gerritProject string) string {
-	switch gerritProject {
-	case "mojo-manifest":
-		return "manifest"
-	}
-	return gerritProject
-}
-
 // readJiriManifest reads the jiri manifest found in JIRI_ROOT.
 func readJiriManifest() (project.Projects, error) {
 	jirix, err := jiri.NewX(cmdline.EnvFromOS())
@@ -151,7 +140,8 @@ func main() {
 
 	// Patch the projects that changed.
 	for _, cl := range cls {
-		localProject, err := projects.FindUnique(gerritProjectToJiriProject(cl.Project))
+		// TODO(lanechr): remove the implicit assumption here that gerrit repo name == jiri project name.
+		localProject, err := projects.FindUnique(cl.Project)
 		quitOnError(err)
 
 		err = patchProject(localProject, cl)
