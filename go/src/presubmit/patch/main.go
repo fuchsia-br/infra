@@ -20,12 +20,16 @@ import (
 	"v.io/x/lib/cmdline"
 )
 
+const presubmitBranchName string = "underscore-presubmit"
+
 var (
-	refsToTest string
+	refsToTest       string
+	cleanOldBranches bool
 )
 
 func init() {
-	flag.StringVar(&refsToTest, "cl", "", "comma-separated list of change/patchset. Example: 1153/2,1150/1")
+	flag.StringVar(&refsToTest, "cl", "", "Comma-separated list of change/patchset. Example: 1153/2,1150/1")
+	flag.BoolVar(&cleanOldBranches, "clean", true, "Whether to remove all presubmit branches before patching")
 }
 
 // splitRef parses the string arguments given to the -cl flag.
@@ -65,6 +69,54 @@ func readJiriManifest() (project.Projects, error) {
 	return projects, nil
 }
 
+func getSequence() runutil.Sequence {
+	return runutil.NewSequence(nil, os.Stdin, os.Stdout, os.Stderr, false, false)
+}
+
+// cleanAllProjects deletes any presubmit branches that already exist.  We don't run
+// this after patchProject (e.g. in a defer) because unlike v23's system, our `patch`
+// tool is separate and standalone.  We run this _before_ we do any patching.
+//
+// This approach also has the nice side effect of ensuring there are no lingering
+// changes in unrelated projects, no matter what the result of previous tests.
+func cleanAllProjects(allProjects project.Projects) error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	defer os.Chdir(cwd) // Unnecessary since we expect to quit on error, but whatev.
+
+	git := gitutil.New(getSequence())
+
+	for _, project := range allProjects {
+		err = os.Chdir(project.Path)
+		if err != nil {
+			return err
+		}
+
+		if git.BranchExists(presubmitBranchName) {
+			// Make sure we're not on the presubmit branch (else the delete will fail).
+			err = git.CheckoutBranch("origin/master")
+			if err != nil {
+				return err
+			}
+
+			// Delete the presubmit branch.
+			err = git.DeleteBranch(presubmitBranchName, gitutil.ForceOpt(true))
+			if err != nil {
+				return err
+			}
+		}
+
+		// Move back to original directory in case paths are defined relatively.
+		err = os.Chdir(cwd)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // patchProject changes directory into the project directory, checks out the given
 // change, then cds back to the original directory.
 func patchProject(jiriProject project.Project, cl gerrit.Change) error {
@@ -79,10 +131,9 @@ func patchProject(jiriProject project.Project, cl gerrit.Change) error {
 		return err
 	}
 
-	seq := runutil.NewSequence(nil, os.Stdin, os.Stdout, os.Stderr, false, false)
-	git := gitutil.New(seq)
+	git := gitutil.New(getSequence())
 
-	err = git.CreateAndCheckoutBranch("underscore-presubmit")
+	err = git.CreateAndCheckoutBranch(presubmitBranchName)
 	if err != nil {
 		return err
 	}
@@ -137,6 +188,12 @@ func main() {
 	// map to the project names that come back from gerrit.
 	projects, err := readJiriManifest()
 	quitOnError(err)
+
+	// Clean all projects of any previous test branches.
+	if cleanOldBranches {
+		err = cleanAllProjects(projects)
+		quitOnError(err)
+	}
 
 	// Patch the projects that changed.
 	for _, cl := range cls {
