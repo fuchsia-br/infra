@@ -10,7 +10,6 @@ package presubmit
 
 import (
 	"flag"
-	"fmt"
 	"net/url"
 	"strings"
 
@@ -38,21 +37,17 @@ func getJenkins() (*jenkins.Jenkins, error) {
 	return jenkinsInstance, err
 }
 
-// LastPresubmitBuildError returns the error of the last presubmit build, or nil if the build
-// succeeded.  It also returns an error if we fail to fetch the status of the build.
-func LastPresubmitBuildError() error {
+// CheckPresubmitBuildConfig returns an error if the presubmit build is not configured properly.
+// It also returns an error if we fail to fetch the status of the build.
+func CheckPresubmitBuildConfig() error {
 	j, err := getJenkins()
 	if err != nil {
 		return err
 	}
 
-	lastBuildInfo, err := j.LastCompletedBuildStatus(jenkinsPresubmitTestName, nil)
+	_, err = j.LastCompletedBuildStatus(jenkinsPresubmitTestName, nil)
 	if err != nil {
 		return err
-	}
-
-	if lastBuildInfo.Result == "FAILURE" {
-		return fmt.Errorf("%s build result was FAILURE", jenkinsPresubmitTestName)
 	}
 
 	return nil

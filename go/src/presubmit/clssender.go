@@ -24,9 +24,9 @@ type Workflow interface {
 	// AddPresubmitTestBuild should start the presubmit tests with the given CLs.
 	AddPresubmitTestBuild(cls gerrit.CLList) error
 
-	// LastPresubmitBuildError returns the error of the last presubmit build, or nil if the build
-	// succeeded.  It should returns an error if we fail to fetch the status of the build.
-	LastPresubmitBuildError() error
+	// CheckPresubmitBuildConfig returns an error if the presubmit build is not configured
+	// properly, or if it fails to fetch the status of the last build.
+	CheckPresubmitBuildConfig() error
 
 	// PostResults should publish message for the given refs.  Verified indicates whether
 	// the presubmit tool believes this CL is OK to submit.

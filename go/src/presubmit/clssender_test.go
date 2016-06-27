@@ -35,7 +35,7 @@ func (mw *stubWorkflow) PostResults(message string, clRefs []string, verified bo
 	return nil
 }
 
-func (mw *stubWorkflow) LastPresubmitBuildError() error {
+func (mw *stubWorkflow) CheckPresubmitBuildConfig() error {
 	return nil
 }
 

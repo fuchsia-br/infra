@@ -51,8 +51,10 @@ func sendNewChangesForTesting() error {
 		worker = &JenkinsGerritCIWorker{}
 	}
 
-	// Don't send any changes if the presubmit test job is currently failing.
-	if err := worker.LastPresubmitBuildError(); err != nil {
+	// Don't send any changes if the presubmit test job is not configured properly.  This is
+	// nice because `query` will keep track of the CLs it sends to presubmit and will not send
+	// them more than once.  So this makes sure we're sending to a job that at least looks ready.
+	if err := worker.CheckPresubmitBuildConfig(); err != nil {
 		return fmt.Errorf("Refusing to test new CLs because of existing failures\n%v", err)
 	}
 
@@ -133,8 +135,8 @@ func (jg *JenkinsGerritCIWorker) AddPresubmitTestBuild(cls gerrit.CLList) error 
 	return presubmit.AddPresubmitTestBuild(cls)
 }
 
-func (jg *JenkinsGerritCIWorker) LastPresubmitBuildError() error {
-	return presubmit.LastPresubmitBuildError()
+func (jg *JenkinsGerritCIWorker) CheckPresubmitBuildConfig() error {
+	return presubmit.CheckPresubmitBuildConfig()
 }
 
 func (jg *JenkinsGerritCIWorker) PostResults(message string, clRefs []string, verified bool) error {
@@ -153,7 +155,7 @@ func (w *DryRunCIWorker) AddPresubmitTestBuild(cls gerrit.CLList) error {
 	return nil
 }
 
-func (w *DryRunCIWorker) LastPresubmitBuildError() error {
+func (w *DryRunCIWorker) CheckPresubmitBuildConfig() error {
 	return nil
 }
 
