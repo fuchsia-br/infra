@@ -30,10 +30,12 @@ $ go build presubmit/patch
 ```
 
 # Running
-The presubmit logic is organized into two different tools: `query` and `patch`.
+The presubmit logic is organized into three different tools: `query`, `patch`,
+and `report`.
 
 * `query` checks Gerrit for new CLs and sends them to CI for testing.
 * `patch` is used by CI to patch the given CLs into its code tree.
+* `report` is used by the CI test runner to report its findings to Gerrit.
 
 ## query
 `query` requires at least one argument: the gerrit host to query.  Running
@@ -52,3 +54,18 @@ Internally, the CI jobs can use `presubmit/patch` to take the CLs given and
 patch its code tree before building and running tests.
 
 See `patch -h` for more options.
+
+## report
+Test results are reported to the user via posting comments on the Gerrit CLs.
+The authentication code for this process is located in `v.io/jiri/gerrit`, and
+the tokens are stored on the CI system via `.gitcookies`.
+
+Most Fuchsia repos also use a concept of `Verified`, which enforces that
+presubmit bots have successfully built and tested a change before it can be
+submitted.  The rights to mark `Verified` on Gerrit are managed separately from
+those required for commenting.  The presubmit bot's account must have both.
+
+When running `report` on your workstation, you may find you don't have rights
+to mark changes as `Verified`.
+
+See `report -h` for instructions and options.

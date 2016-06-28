@@ -8,10 +8,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 
 	"presubmit"
+	"presubmit/common"
 	"v.io/jiri"
 	"v.io/jiri/gerrit"
 	"v.io/jiri/gitutil"
@@ -30,30 +29,6 @@ var (
 func init() {
 	flag.StringVar(&refsToTest, "cl", "", "Comma-separated list of change/patchset. Example: 1153/2,1150/1")
 	flag.BoolVar(&cleanOldBranches, "clean", true, "Whether to remove all presubmit branches before patching")
-}
-
-// splitRef parses the string arguments given to the -cl flag.
-func splitRef(ref string) (changelist int, patchset int, e error) {
-	parts := strings.Split(ref, "/")
-	if len(parts) != 2 {
-		// Allow for ref strings in the form of a gerrit reference.
-		if strings.HasPrefix(ref, "refs/changes/") && len(parts) == 5 {
-			parts = parts[3:]
-		} else {
-			return 0, 0, fmt.Errorf(
-				"malformed cl string: %q; examples of supported forms are: 'refs/changes/53/1153/2', or '1153/2'\n", ref)
-		}
-	}
-	changelist, e = strconv.Atoi(parts[0])
-	if e != nil {
-		return 0, 0, e
-	}
-	patchset, e = strconv.Atoi(parts[1])
-	if e != nil {
-		return 0, 0, e
-	}
-	e = nil
-	return
 }
 
 // readJiriManifest reads the jiri manifest found in JIRI_ROOT.
@@ -163,18 +138,17 @@ func main() {
 
 	// Construct the list of changes we're going to test.
 	cls := []gerrit.Change{}
-	for _, ref := range strings.Split(refsToTest, ",") {
-		clNumber, patchset, err := splitRef(ref)
-		quitOnError(err)
-
-		cl, err := g.GetChange(clNumber)
+	refs, err := common.ParseRefArg(refsToTest)
+	quitOnError(err)
+	for _, ref := range refs {
+		cl, err := g.GetChange(ref.Changelist)
 		quitOnError(err)
 
 		foundCl, foundPs, err := gerrit.ParseRefString(cl.Reference())
 		quitOnError(err)
 
 		// Abandon the test if we were given outdated patchsets.
-		if foundPs != patchset {
+		if foundPs != ref.Patchset {
 			quitOnError(fmt.Errorf("%q is outdated; there's a newer patchset (%d/%d)\n",
 				ref, foundCl, foundPs))
 		}

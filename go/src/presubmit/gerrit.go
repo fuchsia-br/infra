@@ -54,6 +54,21 @@ const (
 	VerifiedPass    VerifiedScore = 1
 )
 
+func VerifiedScoreFromString(verifiedStr string) (VerifiedScore, error) {
+	switch verifiedStr {
+	case "-1":
+		return VerifiedFail, nil
+	case "0":
+		return VerifiedNeutral, nil
+	case "1":
+		return VerifiedPass, nil
+	case "+1":
+		return VerifiedPass, nil
+	default:
+		return VerifiedNeutral, fmt.Errorf("Unrecognized 'Verified' score: %s", verifiedStr)
+	}
+}
+
 // CLListToString converts a gerrit.CLList to a string for making of nice logging.
 func CLListToString(cls gerrit.CLList) string {
 	clRefs := []string{}
