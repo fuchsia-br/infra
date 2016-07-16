@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	jenkinsHost              = "http://localhost:8090/jenkins"
+	jenkinsHost              = "http://localhost:8001/jenkins"
 	jenkinsPresubmitTestName string
 	jenkinsInstance          *jenkins.Jenkins
 )
