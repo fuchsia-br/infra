@@ -19,6 +19,7 @@ native_viewport
 packages
 third_party/binutils-gdb
 third_party/blueprint
+third_party/boringssl
 third_party/clang
 third_party/cmake
 third_party/compiler-rt
