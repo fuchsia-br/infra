@@ -19,6 +19,7 @@ var (
 	logFilePath string
 	forceSend   bool
 	dryRun      bool
+	testName    string
 )
 
 func init() {
@@ -26,6 +27,7 @@ func init() {
 	flag.StringVar(&logFilePath, "logfile", "/tmp/fuchsia-presubmit-log.json", "Full path of log file to use")
 	flag.BoolVar(&forceSend, "f", false, "Send all changes, even if they've already been sent")
 	flag.BoolVar(&dryRun, "n", false, "Query gerrit, log normally, but don't actually send to CI")
+	flag.StringVar(&testName, "test", "presubmit-test", "The name of the presubmit test job")
 }
 
 // sendNewChangesForTesting queries gerrit for new changes, where changes may be grouped into related
@@ -132,11 +134,11 @@ func (jg *JenkinsGerritCIWorker) RemoveOutdatedBuilds(outdatedCLs map[presubmit.
 }
 
 func (jg *JenkinsGerritCIWorker) AddPresubmitTestBuild(cls gerrit.CLList) error {
-	return presubmit.AddPresubmitTestBuild(cls)
+	return presubmit.AddPresubmitTestBuild(testName, cls)
 }
 
 func (jg *JenkinsGerritCIWorker) CheckPresubmitBuildConfig() error {
-	return presubmit.CheckPresubmitBuildConfig()
+	return presubmit.CheckPresubmitBuildConfig(testName)
 }
 
 func (jg *JenkinsGerritCIWorker) PostResults(message string, changes gerrit.CLList, score presubmit.VerifiedScore) error {

@@ -18,34 +18,33 @@ import (
 )
 
 var (
-	jenkinsHost              = "http://localhost:8001/jenkins"
-	jenkinsPresubmitTestName string
-	jenkinsInstance          *jenkins.Jenkins
+	jenkinsURL      string
+	jenkinsInstance *jenkins.Jenkins
 )
 
 func init() {
-	flag.StringVar(&jenkinsPresubmitTestName, "test", "presubmit-test", "The name of the presubmit test job")
+	flag.StringVar(&jenkinsURL, "jenkins", "http://localhost:8001/jenkins", "The Jenkins endpoint")
 }
 
-// getJenkins returns a handle to the Jenkins instance in a non-thread-safe singleton fashion.
-func getJenkins() (*jenkins.Jenkins, error) {
+// GetJenkins returns a handle to the Jenkins instance in a non-thread-safe singleton fashion.
+func GetJenkins() (*jenkins.Jenkins, error) {
 	if jenkinsInstance != nil {
 		return jenkinsInstance, nil
 	}
 	var err error
-	jenkinsInstance, err = jenkins.New(jenkinsHost)
+	jenkinsInstance, err = jenkins.New(jenkinsURL)
 	return jenkinsInstance, err
 }
 
 // CheckPresubmitBuildConfig returns an error if the presubmit build is not configured properly.
 // It also returns an error if we fail to fetch the status of the build.
-func CheckPresubmitBuildConfig() error {
-	j, err := getJenkins()
+func CheckPresubmitBuildConfig(testName string) error {
+	j, err := GetJenkins()
 	if err != nil {
 		return err
 	}
 
-	_, err = j.LastCompletedBuildStatus(jenkinsPresubmitTestName, nil)
+	_, err = j.LastCompletedBuildStatus(testName, nil)
 	if err != nil {
 		return err
 	}
@@ -61,8 +60,8 @@ func RemoveOutdatedBuilds(validCLs map[CLNumber]Patchset) (errs []error) {
 }
 
 // AddPresubmitTestBuild kicks off the presubmit test build on Jenkins.
-func AddPresubmitTestBuild(cls gerrit.CLList) error {
-	j, err := getJenkins()
+func AddPresubmitTestBuild(testName string, cls gerrit.CLList) error {
+	j, err := GetJenkins()
 	if err != nil {
 		return err
 	}
@@ -72,9 +71,9 @@ func AddPresubmitTestBuild(cls gerrit.CLList) error {
 		refs = append(refs, cl.Reference())
 	}
 
-	if err := j.AddBuildWithParameter(jenkinsPresubmitTestName, url.Values{
-		"REFS":  {strings.Join(refs, ",")},  // The presubmit test must expect comma-separated refs.
-	}); err != nil {
+	// The presubmit test must be parameterized to expect comma-separated refs.
+	err = j.AddBuildWithParameter(testName, url.Values{"REFS": {strings.Join(refs, ",")}})
+	if err != nil {
 		return err
 	}
 
