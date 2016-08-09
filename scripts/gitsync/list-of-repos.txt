@@ -31,6 +31,7 @@ third_party/freetype2
 third_party/gcc_none_toolchains
 third_party/gtest
 third_party/hostap
+third_party/leveldb
 third_party/libcxx
 third_party/libcxxabi
 third_party/libunwind
@@ -40,7 +41,9 @@ third_party/llvm
 third_party/lwip
 third_party/ninja
 third_party/qemu
+third_party/re2
 third_party/skia
+third_party/snappy
 third_party/zlib
 toyen
 tracing
