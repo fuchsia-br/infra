@@ -16,7 +16,9 @@ mojo
 moterm
 mtl
 native_viewport
+network
 packages
+third_party/asio
 third_party/binutils-gdb
 third_party/blueprint
 third_party/boringssl
@@ -35,6 +37,7 @@ third_party/libunwind
 third_party/lld
 third_party/lldb
 third_party/llvm
+third_party/lwip
 third_party/ninja
 third_party/qemu
 third_party/skia
