@@ -9,6 +9,7 @@ gerrit/verified-projects
 gigaboot20x6
 infra
 json
+ledger
 logging
 magenta
 manifest
