@@ -19,6 +19,7 @@ mtl
 native_viewport
 network
 packages
+sysui
 third_party/asio
 third_party/binutils-gdb
 third_party/blueprint
