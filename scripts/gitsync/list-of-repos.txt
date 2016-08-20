@@ -8,6 +8,7 @@ fuchsia
 gerrit/verified-projects
 gigaboot20x6
 infra
+jiri
 json
 ledger
 logging
