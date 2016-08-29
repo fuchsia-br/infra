@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"v.io/jiri/gerrit"
+	"fuchsia.googlesource.com/jiri/gerrit"
 )
 
 type CLNumber int

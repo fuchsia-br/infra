@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"presubmit"
-	"v.io/jiri/gerrit"
+	"fuchsia.googlesource.com/jiri/gerrit"
 )
 
 var (

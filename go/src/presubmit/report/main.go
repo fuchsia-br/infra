@@ -12,7 +12,7 @@ import (
 
 	"presubmit"
 	"presubmit/common"
-	"v.io/jiri/gerrit"
+	"fuchsia.googlesource.com/jiri/gerrit"
 )
 
 var (

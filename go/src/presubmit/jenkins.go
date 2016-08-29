@@ -13,8 +13,8 @@ import (
 	"net/url"
 	"strings"
 
-	"v.io/jiri/gerrit"
-	"v.io/jiri/jenkins"
+	"fuchsia.googlesource.com/jiri/gerrit"
+	"fuchsia.googlesource.com/jiri/jenkins"
 )
 
 var (

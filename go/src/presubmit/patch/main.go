@@ -11,12 +11,12 @@ import (
 
 	"presubmit"
 	"presubmit/common"
-	"v.io/jiri"
-	"v.io/jiri/gerrit"
-	"v.io/jiri/gitutil"
-	"v.io/jiri/project"
-	"v.io/jiri/runutil"
-	"v.io/x/lib/cmdline"
+	"fuchsia.googlesource.com/jiri"
+	"fuchsia.googlesource.com/jiri/cmdline"
+	"fuchsia.googlesource.com/jiri/gerrit"
+	"fuchsia.googlesource.com/jiri/gitutil"
+	"fuchsia.googlesource.com/jiri/project"
+	"fuchsia.googlesource.com/jiri/runutil"
 )
 
 const presubmitBranchName string = "underscore-presubmit"

@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"v.io/jiri/gerrit"
-	"v.io/jiri/runutil"
+	"fuchsia.googlesource.com/jiri/gerrit"
+	"fuchsia.googlesource.com/jiri/runutil"
 )
 
 var (

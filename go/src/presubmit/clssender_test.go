@@ -7,7 +7,8 @@ package presubmit
 import (
 	"reflect"
 	"testing"
-	"v.io/jiri/gerrit"
+
+	"fuchsia.googlesource.com/jiri/gerrit"
 )
 
 type postedResult struct {
