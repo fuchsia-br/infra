@@ -68,7 +68,7 @@ upload_tools "pc-x86-64"
 
 # Send a change
 if ! git -C "${JIRI_ROOT}/packages" diff-files --quiet; then
-  git -c "user.email=fuchsia.robot@gmail.com" -c "user.name=Fuchsia Robot" -C "${JIRI_ROOT}/packages" commit -m "Update Magenta prebuilts" -m "Updated to Magenta commit ${MAGENTA_HASH}." -- packages/prebuilt/versions/magenta/*
+  git -c "user.email=fuchsia.robot@gmail.com" -c "user.name=Fuchsia Robot" -C "${JIRI_ROOT}/packages" commit -m "Update Magenta prebuilts" -m "Updated to Magenta commit ${MAGENTA_HASH}." -- prebuilt/versions/magenta/*
   git -c "user.email=fuchsia.robot@gmail.com" -c "user.name=Fuchsia Robot" -C "${JIRI_ROOT}/packages" push origin HEAD:refs/for/master%${GERRIT_OPTS:-}
 fi
 
