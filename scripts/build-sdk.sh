@@ -39,7 +39,7 @@ if [[ ! -d "${OUT_DIR}" ]]; then
 else
   ninja -C ${OUT_DIR} sysroot-distclean
 fi
-${JIRI_ROOT}/.jiri_root/bin/toyen -src "${JIRI_ROOT}" -out "${OUT_DIR}" "${JIRI_ROOT}/packages/root.bp"
+${JIRI_ROOT}/.jiri_root/bin/toyen -src "${JIRI_ROOT}" -out "${OUT_DIR}" "${JIRI_ROOT}/packages/blueprint/root.bp"
 ninja -C "${OUT_DIR}" -j1 sysroot
 
 readonly MAGENTA_BINARIES=("magenta.bin" "magenta.elf")
