@@ -17,6 +17,7 @@
 import json
 import requests
 import sys
+import string
 
 def main():
     r = requests.get('https://fuchsia-review.googlesource.com/projects/')
@@ -25,7 +26,7 @@ def main():
         return 1
     projects = json.loads(r.text[5:])
     with open('list-of-repos.txt') as current_list:
-        listed_projects = current_list.readlines()
+        listed_projects = map(string.strip, current_list.readlines())
     meta_projects = ['All-Projects', 'All-Users', 'gerrit/verified-projects']
     project_diff = set(projects.keys()) - set(meta_projects) - set(listed_projects)
     if len(project_diff) != 0:
