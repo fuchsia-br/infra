@@ -1,0 +1,91 @@
+[
+  {
+    "cmd": [
+      "python",
+      "-u",
+      "RECIPE_MODULE[infra::go]/resources/bootstrap.py",
+      "--platform",
+      "linux-amd64",
+      "--dest-directory",
+      "[SLAVE_BUILD]/go",
+      "--json-output",
+      "/path/to/tmp/json"
+    ],
+    "name": "install go",
+    "~followup_annotations": [
+      "@@@STEP_TEXT@Go version: go1.7@@@",
+      "@@@STEP_LOG_LINE@json.output@{@@@",
+      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[SLAVE_BUILD]/go/go/bin/go\", @@@",
+      "@@@STEP_LOG_LINE@json.output@  \"version\": \"go1.7\"@@@",
+      "@@@STEP_LOG_LINE@json.output@}@@@",
+      "@@@STEP_LOG_END@json.output@@@"
+    ]
+  },
+  {
+    "cmd": [
+      "python",
+      "-u",
+      "RECIPE_MODULE[infra::go]/resources/bootstrap.py",
+      "--platform",
+      "linux-amd64",
+      "--dest-directory",
+      "[SLAVE_BUILD]/go",
+      "--json-output",
+      "/path/to/tmp/json",
+      "--version",
+      "go1.6"
+    ],
+    "name": "install go (2)",
+    "~followup_annotations": [
+      "@@@STEP_TEXT@Go version: go1.6@@@",
+      "@@@STEP_LOG_LINE@json.output@{@@@",
+      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[SLAVE_BUILD]/go/go/bin/go\", @@@",
+      "@@@STEP_LOG_LINE@json.output@  \"version\": \"go1.6\"@@@",
+      "@@@STEP_LOG_LINE@json.output@}@@@",
+      "@@@STEP_LOG_END@json.output@@@"
+    ]
+  },
+  {
+    "cmd": [
+      "[SLAVE_BUILD]/go/go/bin/go",
+      "build",
+      "fuchsia.googlesource.com/foo"
+    ],
+    "name": "go build"
+  },
+  {
+    "cmd": [
+      "[SLAVE_BUILD]/go/go/bin/go",
+      "build",
+      "-ldflags",
+      "-X foo bar",
+      "-i",
+      "-a",
+      "-o",
+      "bar",
+      "fuchsia.googlesource.com/foo"
+    ],
+    "name": "go build (2)"
+  },
+  {
+    "cmd": [
+      "[SLAVE_BUILD]/go/go/bin/go",
+      "test",
+      "fuchsia.googlesource.com/foo"
+    ],
+    "name": "go test"
+  },
+  {
+    "cmd": [
+      "[SLAVE_BUILD]/go/go/bin/go",
+      "run",
+      "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Printf(\"Hello, world.\n\")\n}"
+    ],
+    "name": "go run"
+  },
+  {
+    "name": "$result",
+    "recipe_result": null,
+    "status_code": 0
+  }
+]

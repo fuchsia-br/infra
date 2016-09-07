@@ -1,0 +1,50 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+DEPS = [
+    'go',
+    'recipe_engine/path',
+    'recipe_engine/platform',
+    'recipe_engine/properties',
+    'recipe_engine/raw_io',
+    'recipe_engine/step',
+]
+
+
+def RunSteps(api):
+    # First, you need a go distribution.
+    api.go.install_go()
+    api.go.install_go(version='go1.6')
+    assert api.go.get_executable()
+
+    # Build a go package.
+    api.go.build(['fuchsia.googlesource.com/foo'])
+    api.go.build(['fuchsia.googlesource.com/foo'], ldflags='-X foo bar',
+                 install=True, force=True, output='bar')
+
+    # Test a go package.
+    api.go.test(['fuchsia.googlesource.com/foo'])
+
+    # Run a go program.
+    input = api.raw_io.input("""package main
+
+import "fmt"
+
+func main() {
+	fmt.Printf("Hello, world.\n")
+}""", '.go')
+
+    api.go.run([input])
+
+
+def GenTests(api):
+    yield (
+        api.test('basic') +
+        api.platform('linux', 64)
+    )
+
+    yield (
+        api.test('install-failed') +
+        api.step_data('install go', retcode=1)
+    )

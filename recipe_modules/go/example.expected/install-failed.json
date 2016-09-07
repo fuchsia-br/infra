@@ -1,0 +1,31 @@
+[
+  {
+    "cmd": [
+      "python",
+      "-u",
+      "RECIPE_MODULE[infra::go]/resources/bootstrap.py",
+      "--platform",
+      "linux-amd64",
+      "--dest-directory",
+      "[SLAVE_BUILD]/go",
+      "--json-output",
+      "/path/to/tmp/json"
+    ],
+    "name": "install go",
+    "~followup_annotations": [
+      "step returned non-zero exit code: 1",
+      "@@@STEP_LOG_LINE@json.output@{@@@",
+      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[SLAVE_BUILD]/go/go/bin/go\", @@@",
+      "@@@STEP_LOG_LINE@json.output@  \"version\": \"go1.7\"@@@",
+      "@@@STEP_LOG_LINE@json.output@}@@@",
+      "@@@STEP_LOG_END@json.output@@@",
+      "@@@STEP_FAILURE@@@"
+    ]
+  },
+  {
+    "name": "$result",
+    "reason": "Step('install go') failed with return_code 1",
+    "recipe_result": null,
+    "status_code": 1
+  }
+]

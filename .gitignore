@@ -108,3 +108,14 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Recipes
+/.recipe_deps
