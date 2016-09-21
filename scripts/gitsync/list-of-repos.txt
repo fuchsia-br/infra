@@ -21,6 +21,7 @@ logging
 magenta
 magma
 manifest
+maxwell
 media
 modular
 modules
