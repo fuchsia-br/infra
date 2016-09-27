@@ -29,6 +29,7 @@ mojo
 mojo/public
 mojom
 moterm
+mozart
 msd-intel-gen
 mtl
 native_viewport
