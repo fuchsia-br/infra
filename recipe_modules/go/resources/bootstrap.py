@@ -36,7 +36,7 @@ def temp_dir(base=None):
 
 def install_go(path, platform, version):
     """Installs Go distribution to <path>/go
-  
+
     Args:
         path: root directory to install Go distribution into.
         platform: Go distribution platform, e.g. linux-amd64.
@@ -45,12 +45,12 @@ def install_go(path, platform, version):
     Returns:
         Absolute path to Go distribution.
     """
-    version_file = os.path.join(path, 'go', 'VERSION')
-    bin_file = os.path.join(path, 'go', 'bin', 'go')
+    go_path = os.path.join(path, 'go')
+    version_file = os.path.join(go_path, 'VERSION')
 
     installed_version = (read_file(version_file) or '').strip()
-    if installed_version == version and os.path.exists(bin_file):
-        return bin_file, version
+    if installed_version == version and os.path.exists(go_dir):
+        return go_dir, version
 
     ensure_directory(path)
     with temp_dir(path) as d:
@@ -78,7 +78,7 @@ def install_go(path, platform, version):
                 os.remove(dstname)
         os.rename(os.path.join(d, 'go'), dstname)
 
-    return bin_file, version
+    return go_path, version
 
 
 def sha256(filename):
@@ -145,10 +145,10 @@ def main():
     args = parser.parse_args()
 
     try:
-        exe_path, version = install_go(
+        go_path, version = install_go(
             args.dest_directory, args.platform, args.version)
         result = {
-            'executable': exe_path,
+            'path': go_path,
             'version': version
         }
         if args.json_output:

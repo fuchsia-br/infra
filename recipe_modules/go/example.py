@@ -16,15 +16,13 @@ def RunSteps(api):
     # First, you need a go distribution.
     api.go.install_go()
     api.go.install_go(version='go1.6')
-    assert api.go.get_executable()
+    assert api.go.go_executable
 
     # Build a go package.
-    api.go.build(['fuchsia.googlesource.com/foo'])
-    api.go.build(['fuchsia.googlesource.com/foo'], ldflags='-X foo bar',
-                 install=True, force=True, output='bar')
+    api.go('build', 'fuchsia.googlesource.com/foo')
 
     # Test a go package.
-    api.go.test(['fuchsia.googlesource.com/foo'])
+    api.go('test', 'fuchsia.googlesource.com/foo')
 
     # Run a go program.
     input = api.raw_io.input("""package main
@@ -35,7 +33,16 @@ func main() {
 	fmt.Printf("Hello, world.\n")
 }""", '.go')
 
-    api.go.run([input])
+    api.go('run', input)
+
+    # Run an inline go program.
+    api.go.inline("""package main
+
+import "fmt"
+
+func main() {
+	fmt.Printf("Hello, world.\n")
+}""")
 
 
 def GenTests(api):

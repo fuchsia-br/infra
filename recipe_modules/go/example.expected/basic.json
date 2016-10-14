@@ -15,7 +15,7 @@
     "~followup_annotations": [
       "@@@STEP_TEXT@Go version: go1.7@@@",
       "@@@STEP_LOG_LINE@json.output@{@@@",
-      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[SLAVE_BUILD]/go/go/bin/go\", @@@",
+      "@@@STEP_LOG_LINE@json.output@  \"path\": \"[SLAVE_BUILD]/go/go\", @@@",
       "@@@STEP_LOG_LINE@json.output@  \"version\": \"go1.7\"@@@",
       "@@@STEP_LOG_LINE@json.output@}@@@",
       "@@@STEP_LOG_END@json.output@@@"
@@ -39,7 +39,7 @@
     "~followup_annotations": [
       "@@@STEP_TEXT@Go version: go1.6@@@",
       "@@@STEP_LOG_LINE@json.output@{@@@",
-      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[SLAVE_BUILD]/go/go/bin/go\", @@@",
+      "@@@STEP_LOG_LINE@json.output@  \"path\": \"[SLAVE_BUILD]/go/go\", @@@",
       "@@@STEP_LOG_LINE@json.output@  \"version\": \"go1.6\"@@@",
       "@@@STEP_LOG_LINE@json.output@}@@@",
       "@@@STEP_LOG_END@json.output@@@"
@@ -51,21 +51,10 @@
       "build",
       "fuchsia.googlesource.com/foo"
     ],
+    "env": {
+      "GOROOT": "[SLAVE_BUILD]/go/go"
+    },
     "name": "go build"
-  },
-  {
-    "cmd": [
-      "[SLAVE_BUILD]/go/go/bin/go",
-      "build",
-      "-ldflags",
-      "-X foo bar",
-      "-i",
-      "-a",
-      "-o",
-      "bar",
-      "fuchsia.googlesource.com/foo"
-    ],
-    "name": "go build (2)"
   },
   {
     "cmd": [
@@ -73,6 +62,9 @@
       "test",
       "fuchsia.googlesource.com/foo"
     ],
+    "env": {
+      "GOROOT": "[SLAVE_BUILD]/go/go"
+    },
     "name": "go test"
   },
   {
@@ -81,7 +73,32 @@
       "run",
       "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Printf(\"Hello, world.\n\")\n}"
     ],
+    "env": {
+      "GOROOT": "[SLAVE_BUILD]/go/go"
+    },
     "name": "go run"
+  },
+  {
+    "cmd": [
+      "[SLAVE_BUILD]/go/go/bin/go",
+      "run",
+      "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Printf(\"Hello, world.\n\")\n}"
+    ],
+    "env": {
+      "GOROOT": "[SLAVE_BUILD]/go/go"
+    },
+    "name": "go run (2)",
+    "~followup_annotations": [
+      "@@@STEP_LOG_LINE@go.inline@package main@@@",
+      "@@@STEP_LOG_LINE@go.inline@@@@",
+      "@@@STEP_LOG_LINE@go.inline@import \"fmt\"@@@",
+      "@@@STEP_LOG_LINE@go.inline@@@@",
+      "@@@STEP_LOG_LINE@go.inline@func main() {@@@",
+      "@@@STEP_LOG_LINE@go.inline@\tfmt.Printf(\"Hello, world.@@@",
+      "@@@STEP_LOG_LINE@go.inline@\")@@@",
+      "@@@STEP_LOG_LINE@go.inline@}@@@",
+      "@@@STEP_LOG_END@go.inline@@@"
+    ]
   },
   {
     "name": "$result",
