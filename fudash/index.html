@@ -1,0 +1,13 @@
+<html>
+<head>
+    <link rel="stylesheet" href="main.css">
+    <meta http-equiv="refresh" content="60">
+</head>
+<body>
+{% for target in targets %}
+    <a href="{{target.href}}">
+        <div class="target {{target.result}}">{{target.name}}</div>
+    </a>
+{% endfor %}
+</body>
+</html>

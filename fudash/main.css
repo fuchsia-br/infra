@@ -1,0 +1,53 @@
+/* Copyright 2016 The Fuchsia Authors. All rights reserved.
+ * Use of this source code is governed under the Apache License, Version 2.0
+ * that can be found in the LICENSE file.
+ */
+
+a {
+    text-decoration: none;
+}
+
+.target {
+    border: 0.5px solid #333;
+    color: white;
+    font-family: sans-serif;
+    font-size: 1.5em;
+    line-height: 2em;
+    margin-bottom: 0.5em;
+    padding-left: 0.5em;
+}
+
+.fail {
+    background: repeating-linear-gradient(
+        -55deg,
+        #BA4046,
+        #BA4046 30px,
+        #D44950 30px,
+        #D44950 60px
+    );
+}
+
+.pass {
+    background: #49B974;
+}
+
+.server_error {
+    background: repeating-linear-gradient(
+        -55deg,
+        #444,
+        #444 30px,
+        #555 30px,
+        #555 60px
+    );
+}
+
+.parser_error {
+    background: repeating-linear-gradient(
+        -55deg,
+        #FEC859,
+        #FEC859 30px,
+        #FDB522 30px,
+        #FDB522 60px
+    );
+    color: #333;
+}
