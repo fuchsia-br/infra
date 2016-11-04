@@ -5,6 +5,7 @@
 # that can be found in the LICENSE file.
 
 import os
+import time
 from HTMLParser import HTMLParser
 
 from google.appengine.api import urlfetch
@@ -75,7 +76,8 @@ class MainPage(webapp2.RequestHandler):
 
     def get(self):
         template_values = {
-            'targets': []
+            'clock': time.strftime("%H:%M UTC", time.gmtime()),
+            'targets': [],
         }
         for t in TARGETS:
             result = {
