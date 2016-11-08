@@ -37,7 +37,7 @@ create() {
     --network "default" \
     --metadata-from-file "startup-script=gce-startup-script.sh" \
     --maintenance-policy "MIGRATE" \
-    --scopes default="https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring.write","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/userinfo.email" \
+    --scopes default="https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring.write","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/userinfo.email" \
     --tags "use-swarming-auth" \
     --image "/ubuntu-os-cloud/ubuntu-1404-trusty-v20160809a" \
     --boot-disk-size "${disk_size}" \
