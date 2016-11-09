@@ -19,6 +19,6 @@ dev_appserver.py ./app.yaml
 ## Deploying new versions
 
 ```
-gcloud config set project $project_name
+gcloud config set project fuchsia-dashboard
 gcloud app deploy app.yaml
 ```
