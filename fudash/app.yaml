@@ -14,3 +14,4 @@ handlers:
   upload: main\.css
 - url: /.*
   script: main.app
+  secure: always
