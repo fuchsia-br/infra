@@ -12,6 +12,13 @@ class JiriApi(recipe_api.RecipeApi):
         super(JiriApi, self).__init__(*args, **kwargs)
         self._jiri_executable = None
 
+    def __call__(self, *args, **kwargs):
+        """Return a jiri command step."""
+        assert self._jiri_executable
+        name = kwargs.pop('name', 'jiri ' + args[0])
+        jiri_cmd = [self._jiri_executable]
+        return self.m.step(name, jiri_cmd + list(args), **kwargs)
+
     def ensure_jiri(self):
         self.m.cipd.install_client()
         jiri_package = ('fuchsia/tools/jiri/%s' %
@@ -26,63 +33,51 @@ class JiriApi(recipe_api.RecipeApi):
         return self._jiri_executable
 
     def init(self, dir=None, **kwargs):
-        assert self._jiri_executable
-
-        cmd = [
-            self._jiri_executable,
-            'init',
-        ]
+        cmd = [ 'init', '-cache', self.m.path['jiri_cache'] ]
         if dir:
             cmd.append(dir)
 
-        return self.m.step('init', cmd)
+        return self(*cmd, **kwargs)
 
-    def update(self, gc=False, manifest=None, **kwargs):
-        assert self._jiri_executable
-
+    def describe(self, *projects, **kwargs):
         cmd = [
-            self._jiri_executable,
-            'update', '-autoupdate=false',
-        ]
+            'project', 'info', '-json-output', self.m.json.output(),
+        ] + list(projects)
+        kwargs.setdefault('name', 'jiri project info')
+
+        return self(
+            *cmd,
+            step_test_data=lambda: self.test_api.example_describe(projects),
+            **kwargs
+        )
+
+    def update(self, gc=False, snapshot=None, **kwargs):
+        cmd = [ 'update', '-autoupdate=false' ]
         if gc:
             cmd.extend(['-gc=true'])
-        if manifest:
-            cmd.extend(['-manifest=%s' % manifest]) 
+        if snapshot is not None:
+            cmd.append(snapshot)
 
-        return self.m.step('update', cmd)
+        return self(*cmd, **kwargs)
 
     def clean_project(self, branches=False, **kwargs):
-        assert self._jiri_executable
-
-        cmd = [
-            self._jiri_executable,
-            'project', 'clean'
-        ]
+        cmd = [ 'project', 'clean' ]
         if branches:
             cmd.extend(['-branches=true'])
+        kwargs.setdefault('name', 'jiri project clean')
 
-        return self.m.step('project clean', cmd)
+        return self(*cmd, **kwargs)
 
     def import_manifest(self, manifest, remote, overwrite=False, **kwargs):
-        assert self._jiri_executable
-
-        cmd = [
-            self._jiri_executable,
-            'import',
-        ]
+        cmd = [ 'import' ]
         if overwrite:
             cmd.extend(['-overwrite=true'])
         cmd.extend([manifest, remote])
 
-        return self.m.step('import', cmd)
+        return self(*cmd, **kwargs)
 
     def patch(self, ref, host=None, delete=False, force=False, **kwargs):
-        assert self._jiri_executable
-
-        cmd = [
-            self._jiri_executable,
-            'cl', 'patch'
-        ]
+        cmd = [ 'patch' ]
         if host:
             cmd.extend(['-host', host])
         if delete:
@@ -91,4 +86,7 @@ class JiriApi(recipe_api.RecipeApi):
             cmd.extend(['-force=true'])
         cmd.extend([ref])
 
-        return self.m.step('patch', cmd)
+        return self(*cmd, **kwargs)
+
+    def snapshot(self, file, step_test_data=None, **kwargs):
+        return self('snapshot', file, step_test_data=step_test_data)

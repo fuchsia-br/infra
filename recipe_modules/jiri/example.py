@@ -7,6 +7,7 @@ DEPS = [
     'recipe_engine/path',
     'recipe_engine/platform',
     'recipe_engine/properties',
+    'recipe_engine/raw_io',
     'recipe_engine/step',
 ]
 
@@ -25,7 +26,24 @@ def RunSteps(api):
                              overwrite=True)
 
     # Download all projects.
-    api.jiri.update(gc=True, manifest='minimal')
+    api.jiri.update(gc=True, snapshot='snapshot')
+
+    # Take a snapshot.
+    step_result = api.jiri.snapshot(
+        api.raw_io.output(),
+        step_test_data=lambda: api.raw_io.test_api.output('''
+<manifest>
+  <projects>
+  <project name="manifest" path="manifest"
+  remote="https://fuchsia.googlesource.com/manifest" revision="4c2b0da3c06341db5cebe4d02c78c93c3b2bd78b"/>
+  </projects>
+</manifest>
+'''))
+    snapshot = step_result.raw_io.output
+    step_result.presentation.logs['jiri.snapshot'] = snapshot.splitlines()
+
+    # Get information about the project.
+    api.jiri.describe('test')
 
     # Patch in an existing change.
     api.jiri.patch('refs/changes/1/2/3',

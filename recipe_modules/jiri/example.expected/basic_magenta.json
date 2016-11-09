@@ -49,9 +49,11 @@
     "cmd": [
       "[CACHE]/cipd/jiri",
       "init",
+      "-cache",
+      "[JIRI_CACHE]",
       "dir"
     ],
-    "name": "init"
+    "name": "jiri init"
   },
   {
     "cmd": [
@@ -61,7 +63,7 @@
       "minimal",
       "https://fuchsia.googlesource.com"
     ],
-    "name": "import"
+    "name": "jiri import"
   },
   {
     "cmd": [
@@ -69,14 +71,58 @@
       "update",
       "-autoupdate=false",
       "-gc=true",
-      "-manifest=minimal"
+      "snapshot"
     ],
-    "name": "update"
+    "name": "jiri update"
   },
   {
     "cmd": [
       "[CACHE]/cipd/jiri",
-      "cl",
+      "snapshot",
+      "/path/to/tmp/"
+    ],
+    "name": "jiri snapshot",
+    "~followup_annotations": [
+      "@@@STEP_LOG_LINE@jiri.snapshot@@@@",
+      "@@@STEP_LOG_LINE@jiri.snapshot@<manifest>@@@",
+      "@@@STEP_LOG_LINE@jiri.snapshot@  <projects>@@@",
+      "@@@STEP_LOG_LINE@jiri.snapshot@  <project name=\"manifest\" path=\"manifest\"@@@",
+      "@@@STEP_LOG_LINE@jiri.snapshot@  remote=\"https://fuchsia.googlesource.com/manifest\" revision=\"4c2b0da3c06341db5cebe4d02c78c93c3b2bd78b\"/>@@@",
+      "@@@STEP_LOG_LINE@jiri.snapshot@  </projects>@@@",
+      "@@@STEP_LOG_LINE@jiri.snapshot@</manifest>@@@",
+      "@@@STEP_LOG_END@jiri.snapshot@@@"
+    ]
+  },
+  {
+    "cmd": [
+      "[CACHE]/cipd/jiri",
+      "project",
+      "info",
+      "-json-output",
+      "/path/to/tmp/json",
+      "test"
+    ],
+    "name": "jiri project info",
+    "~followup_annotations": [
+      "@@@STEP_LOG_LINE@json.output@[@@@",
+      "@@@STEP_LOG_LINE@json.output@  {@@@",
+      "@@@STEP_LOG_LINE@json.output@    \"branches\": [@@@",
+      "@@@STEP_LOG_LINE@json.output@      \"(HEAD detached at c22471f)\", @@@",
+      "@@@STEP_LOG_LINE@json.output@      \"master\"@@@",
+      "@@@STEP_LOG_LINE@json.output@    ], @@@",
+      "@@@STEP_LOG_LINE@json.output@    \"current_branch\": \"\", @@@",
+      "@@@STEP_LOG_LINE@json.output@    \"name\": \"test\", @@@",
+      "@@@STEP_LOG_LINE@json.output@    \"path\": \"/path/to/repo\", @@@",
+      "@@@STEP_LOG_LINE@json.output@    \"remote\": \"https://fuchsia.googlesource.com/repo\", @@@",
+      "@@@STEP_LOG_LINE@json.output@    \"revision\": \"c22471f4e3f842ae18dd9adec82ed9eb78ed1127\"@@@",
+      "@@@STEP_LOG_LINE@json.output@  }@@@",
+      "@@@STEP_LOG_LINE@json.output@]@@@",
+      "@@@STEP_LOG_END@json.output@@@"
+    ]
+  },
+  {
+    "cmd": [
+      "[CACHE]/cipd/jiri",
       "patch",
       "-host",
       "https://fuchsia-review.googlesource.com",
@@ -84,7 +130,7 @@
       "-force=true",
       "refs/changes/1/2/3"
     ],
-    "name": "patch"
+    "name": "jiri patch"
   },
   {
     "cmd": [
@@ -93,7 +139,7 @@
       "clean",
       "-branches=true"
     ],
-    "name": "project clean"
+    "name": "jiri project clean"
   },
   {
     "name": "$result",
