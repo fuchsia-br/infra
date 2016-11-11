@@ -89,4 +89,8 @@ class JiriApi(recipe_api.RecipeApi):
         return self(*cmd, **kwargs)
 
     def snapshot(self, file, step_test_data=None, **kwargs):
-        return self('snapshot', file, step_test_data=step_test_data)
+        return self(
+            'snapshot', file,
+            step_test_data=step_test_data or self.test_api.example_snapshot,
+            **kwargs
+        )

@@ -23,3 +23,12 @@ class JiriTestApi(recipe_test_api.RecipeTestApi):
             }
             for project in projects
         ])
+
+    def example_snapshot(self):
+        return self.m.raw_io.output('''
+<manifest>
+  <projects>
+    <project name="manifest" path="manifest" remote="https://fuchsia.googlesource.com/manifest" revision="4c2b0da3c06341db5cebe4d02c78c93c3b2bd78b"/>
+  </projects>
+</manifest>
+''')

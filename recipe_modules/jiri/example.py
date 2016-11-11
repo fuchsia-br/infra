@@ -29,16 +29,7 @@ def RunSteps(api):
     api.jiri.update(gc=True, snapshot='snapshot')
 
     # Take a snapshot.
-    step_result = api.jiri.snapshot(
-        api.raw_io.output(),
-        step_test_data=lambda: api.raw_io.test_api.output('''
-<manifest>
-  <projects>
-  <project name="manifest" path="manifest"
-  remote="https://fuchsia.googlesource.com/manifest" revision="4c2b0da3c06341db5cebe4d02c78c93c3b2bd78b"/>
-  </projects>
-</manifest>
-'''))
+    step_result = api.jiri.snapshot(api.raw_io.output())
     snapshot = step_result.raw_io.output
     step_result.presentation.logs['jiri.snapshot'] = snapshot.splitlines()
 
