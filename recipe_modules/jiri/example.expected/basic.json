@@ -50,7 +50,7 @@
       "[CACHE]/cipd/jiri",
       "init",
       "-cache",
-      "[JIRI_CACHE]",
+      "[CACHE]/jiri",
       "dir"
     ],
     "name": "jiri init"

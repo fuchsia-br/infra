@@ -33,7 +33,7 @@ class JiriApi(recipe_api.RecipeApi):
         return self._jiri_executable
 
     def init(self, dir=None, **kwargs):
-        cmd = [ 'init', '-cache', self.m.path['jiri_cache'] ]
+        cmd = [ 'init', '-cache', self.m.path['cache'].join('jiri') ]
         if dir:
             cmd.append(dir)
 

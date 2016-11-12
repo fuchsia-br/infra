@@ -103,6 +103,8 @@ print jobs
         assert self._goma_dir
         assert not self._goma_started
 
+        self._goma_ctl_env['GOMA_CACHE_DIR'] = (
+            self.m.path.join(self.m.path['cache'], 'goma'))
         self._goma_ctl_env['GOMA_SERVICE_ACCOUNT_JSON_FILE'] = (
             self.service_account_json_path)
 

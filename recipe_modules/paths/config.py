@@ -16,5 +16,3 @@ def swarmbucket(c):
     c.base_paths['root'] = c.CURRENT_WORKING_DIR[:-4]
     c.base_paths['slave_build'] = c.CURRENT_WORKING_DIR
     c.base_paths['cache'] = c.base_paths['root'] + ('cache',)
-    c.base_paths['goma_cache'] = c.base_paths['root'] + ('goma_cache',)
-    c.base_paths['jiri_cache'] = c.base_paths['root'] + ('jiri_cache',)
