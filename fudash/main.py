@@ -21,8 +21,10 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 BASE_URL = 'https://luci-scheduler.appspot.com/jobs/'
 
 TARGETS = [
-    'fuchsia/linux-x86-64',
-    'fuchsia/linux-arm64',
+    'fuchsia/linux-x86-64-debug',
+    'fuchsia/linux-arm64-debug',
+    'fuchsia/linux-x86-64-release',
+    'fuchsia/linux-arm64-release',
     'magenta/arm32-linux-gcc',
     'magenta/arm64-linux-gcc',
     'magenta/x86-64-linux-gcc',
