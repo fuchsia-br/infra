@@ -28,6 +28,9 @@ TARGETS = [
     'magenta/arm32-linux-gcc',
     'magenta/arm64-linux-gcc',
     'magenta/x86-64-linux-gcc',
+    'magenta/arm32-linux-clang',
+    'magenta/arm64-linux-clang',
+    'magenta/x86-64-linux-clang',
     'jiri/linux-x86-64',
     'jiri/mac-x86-64',
 ]
