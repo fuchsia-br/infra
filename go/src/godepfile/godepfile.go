@@ -86,7 +86,7 @@ func main() {
 		}
 
 		var files []string
-		srcdir := pkg.Root + "/src/"
+		srcdir := pkg.Dir + "/"
 		files = appendAndPrefix(files, srcdir, pkg.GoFiles)
 		files = appendAndPrefix(files, srcdir, pkg.CgoFiles)
 		files = appendAndPrefix(files, srcdir, pkg.CFiles)
