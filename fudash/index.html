@@ -6,9 +6,16 @@
 </head>
 <body>
 {% for target in targets %}
-    <a href="{{target.href}}">
-        <div class="target {{target.result}}">{{target.name}}</div>
-    </a>
+  <h1> {{target.project}} </h1>
+  <ul class="target-container">
+      {% for build_job in target.build_jobs %}
+      <li class="{{build_job.result}}">
+        <a href="{{build_job.href}}">
+          <span class="target-name">{{build_job.name}}</span>
+        </a>
+      </li>
+      {% endfor %}
+  </ul>
 {% endfor %}
 <div class="clock">{{clock}}</div>
 </body>

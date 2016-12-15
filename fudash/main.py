@@ -20,20 +20,32 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 BASE_URL = 'https://luci-scheduler.appspot.com/jobs/'
 
-TARGETS = [
-    'fuchsia/linux-x86-64-debug',
-    'fuchsia/linux-arm64-debug',
-    'fuchsia/linux-x86-64-release',
-    'fuchsia/linux-arm64-release',
-    'magenta/arm32-linux-gcc',
-    'magenta/arm64-linux-gcc',
-    'magenta/x86-64-linux-gcc',
-    'magenta/arm32-linux-clang',
-    'magenta/arm64-linux-clang',
-    'magenta/x86-64-linux-clang',
-    'jiri/linux-x86-64',
-    'jiri/mac-x86-64',
-]
+TARGETS = {
+    'fuchsia': [
+        ('fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'),
+        ('fuchsia/linux-arm64-debug', 'linux-arm64-debug'),
+        ('fuchsia/linux-x86-64-release', 'linux-x86-64-release'),
+        ('fuchsia/linux-arm64-release', 'linux-arm64-release')
+    ],
+    'fuchsia-drivers': [
+        ('fuchsia/drivers-linux-x86-64-debug', 'linux-x86-64-debug'),
+        ('fuchsia/drivers-linux-arm64-debug', 'linux-arm64-debug'),
+        ('fuchsia/drivers-linux-x86-64-release', 'linux-x86-64-release'),
+        ('fuchsia/drivers-linux-arm64-release', 'linux-arm64-release')
+    ],
+    'magenta': [
+        ('magenta/arm32-linux-gcc', 'arm32-linux-gcc'),
+        ('magenta/arm64-linux-gcc', 'arm64-linux-gcc'),
+        ('magenta/x86-64-linux-gcc', 'x86-64-linux-gcc'),
+        ('magenta/arm32-linux-clang', 'arm32-linux-clang'),
+        ('magenta/arm64-linux-clang', 'arm64-linux-clang'),
+        ('magenta/x86-64-linux-clang', 'x86-64-linux-clang')
+    ],
+    'jiri': [
+        ('jiri/linux-x86-64', 'linux-x86-64'),
+        ('jiri/mac-x86-64', 'mac-x86-64')
+    ]
+}
 
 class BuildResult:
     """This is an enum of sorts, except the values match css class names."""
@@ -84,13 +96,22 @@ class MainPage(webapp2.RequestHandler):
             'clock': time.strftime("%H:%M UTC", time.gmtime()),
             'targets': [],
         }
-        for t in TARGETS:
-            result = {
-                'name': t,
-                'result': MainPage.getBuildResult(t),
-                'href': BASE_URL + t,
+        for t in sorted(TARGETS):
+            build_jobs = []
+            for job in TARGETS[t]:
+                url_suffix = job[0]
+                display_name = job[1]
+                result = {
+                    'name': display_name,
+                    'result': MainPage.getBuildResult(url_suffix),
+                    'href': BASE_URL + url_suffix,
+                }
+                build_jobs.append(result)
+            target = {
+                'project': t,
+                'build_jobs': build_jobs
             }
-            template_values['targets'].append(result)
+            template_values['targets'].append(target)
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
