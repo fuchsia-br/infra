@@ -27,6 +27,7 @@ libc-tests
 llvm-passes
 logging
 magenta
+magenta/benchmarks
 magma
 manifest
 maxwell
