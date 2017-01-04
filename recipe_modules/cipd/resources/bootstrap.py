@@ -3,35 +3,27 @@
 # found in the LICENSE file.
 
 import argparse
-import contextlib
 import errno
-import hashlib
 import json
 import os
-import requests
-import shutil
+import subprocess
 import sys
 import tempfile
 import time
 import traceback
+import urllib
+import urllib2
 
 
-# Default package repository URL.
-CIPD_BACKEND_URL = 'https://chrome-infra-packages.appspot.com'
+# CIPD client endpoint.
+CIPD_CLIENT_URL = 'https://chrome-infra-packages.appspot.com/client'
+
+# CIPD client default version.
+CIPD_CLIENT_VERSION = 'git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25'
 
 
 class CipdBootstrapError(Exception):
     """Raised by install_cipd_client on fatal error."""
-
-
-@contextlib.contextmanager
-def temp_dir(base):
-    tmpdir = tempfile.mkdtemp(prefix='cipd', dir=base)
-    try:
-        yield tmpdir
-    finally:
-        if os.path.isdir(tmpdir):
-            shutil.rmtree(tmpdir)
 
 
 def install_cipd_client(path, platform, version):
@@ -45,69 +37,56 @@ def install_cipd_client(path, platform, version):
     Returns:
         Absolute path to CIPD executable.
     """
-    package = 'infra/tools/cipd/%s' % platform
+    cipd_path = os.path.join(path, 'cipd')
 
-    version_file = os.path.join(path, 'VERSION')
-    bin_file = os.path.join(path, 'cipd')
+    if not os.path.exists(cipd_path):
+        status, data = fetch_url(
+            CIPD_CLIENT_URL,
+            {'platform': platform, 'version': version})
+        if status != 200:
+            print 'Failed to fetch client binary, HTTP %d' % status
+            raise CipdBootstrapError('Failed to fetch client binary, HTTP %d' % status)
+        write_file(cipd_path, data)
+        os.chmod(cipd_path, 0755)
 
-    # Resolve version to concrete instance ID, e.g "live" -> "abcdef0123....".
-    instance_id = call_cipd_api(
-        'repo/v1/instance/resolve',
-        {'package_name': package, 'version': version})['instance_id']
+    if subprocess.call([cipd_path, 'selfupdate', '-version', version]) != 0:
+        print 'Failed to selfupdate the client'
+        raise CipdBootstrapError('Failed to selfupdate the client')
 
-    installed_instance_id = (read_file(version_file) or '').strip()
-    if installed_instance_id == instance_id and os.path.exists(bin_file):
-        return bin_file, instance_id
-
-    # Resolve instance ID to an URL to fetch client binary from.
-    client_info = call_cipd_api(
-        'repo/v1/client',
-        {'package_name': package, 'instance_id': instance_id})
-
-    ensure_directory(path)
-    with temp_dir(path) as d:
-        temp_bin_file = os.path.join(d, 'cipd')
-        fetch_file(client_info['client_binary']['fetch_url'], temp_bin_file)
-
-        if sha1(temp_bin_file) != client_info['client_binary']['sha1']:
-            raise CipdBootstrapError('Client SHA1 mismatch')
-        
-        os.rename(temp_bin_file, bin_file)
-        os.chmod(bin_file, 0755)
-
-        write_file(version_file, instance_id + '\n')
-
-    return bin_file, instance_id
+    return cipd_path
 
 
-def call_cipd_api(endpoint, query):
-    """Sends GET request to CIPD backend, parses JSON response."""
-    url = '%s/_ah/api/%s' % (CIPD_BACKEND_URL, endpoint)
-    r = requests.get(url, params=query)
-    r.raise_for_status()
-    body = r.json()
-    status = body.get('status')
-    if status != 'SUCCESS':
-        m = body.get('error_message') or '<no error message>'
-        raise CipdBootstrapError('Server replied with error %s: %s' % (status, m))
-    return body
-
-
-def sha1(filename):
-    sha1_hash = hashlib.sha1()
-    with open(filename, 'rb') as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            sha1_hash.update(chunk)
-    return sha1_hash.hexdigest()
-
-
-def fetch_file(url, filename):
-    r = requests.get(url, stream=True)
-    r.raise_for_status()
-    with open(filename, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=4096):
-            f.write(chunk)
-    return filename
+def fetch_url(url, params=None):
+    """Sends GET request (with retries).
+    Args:
+        url: URL to fetch.
+        params: Optional dictionary with request params.
+    Returns:
+        (200, reply body) on success.
+        (HTTP code, None) on HTTP 401, 403, or 404 reply.
+    Raises:
+        Whatever urllib2 raises.
+    """
+    if params:
+        url += '?' + urllib.urlencode(params)
+    req = urllib2.Request(url)
+    req.add_header('User-Agent', 'cipd recipe bootstrap.py')
+    i = 0
+    while True:
+        i += 1
+        try:
+            return 200, urllib2.urlopen(req, timeout=60).read()
+        except Exception as e:
+            if isinstance(e, urllib2.HTTPError):
+                print 'Failed to fetch %s, server returned HTTP %d' % (url, e.code)
+                if e.code in (401, 403, 404):
+                    return e.code, None
+            else:
+                print 'Failed to fetch %s' % url
+            if i == 20:
+                raise
+        print 'Retrying in %d sec.' % i
+        time.sleep(i)
 
 
 def ensure_directory(path):
@@ -146,25 +125,22 @@ def write_file(path, data):
     os.rename(temp_file, path)
 
 
-def dump_json(obj):
-  """Pretty-formats object to JSON."""
-  return json.dumps(obj, indent=2, sort_keys=True, separators=(',',':'))
-
-
 def main():
     parser = argparse.ArgumentParser('bootstrap cipd')
     parser.add_argument('--json-output', default=None)
-    parser.add_argument('--version', default='latest')
+    parser.add_argument('--version', default=None)
     parser.add_argument('--platform', required=True)
     parser.add_argument('--dest-directory', required=True)
     args = parser.parse_args()
 
+    version = args.version or CIPD_CLIENT_VERSION
+
     try:
-        exe_path, instance_id = install_cipd_client(args.dest_directory,
-                                                    args.platform, args.version)
+        exe_path = install_cipd_client(args.dest_directory,
+                                       args.platform, version)
         result = {
             'executable': exe_path,
-            'instance_id': instance_id
+            'version': version,
         }
         if args.json_output:
             with open(args.json_output, 'w') as f:
@@ -176,6 +152,7 @@ def main():
         return 1
 
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())
