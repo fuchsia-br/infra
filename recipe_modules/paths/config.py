@@ -13,6 +13,6 @@ def common(c):
 
 @CONFIG_CTX(includes=['common'])
 def swarmbucket(c):
-    c.base_paths['root'] = c.CURRENT_WORKING_DIR[:-4]
-    c.base_paths['slave_build'] = c.CURRENT_WORKING_DIR
+    c.base_paths['root'] = c.START_DIR[:-4]
+    c.base_paths['slave_build'] = c.START_DIR
     c.base_paths['cache'] = c.base_paths['root'] + ('cache',)
