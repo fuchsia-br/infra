@@ -9,6 +9,7 @@ docs
 document-store
 drivers/wifi
 dynamic_bindings
+email
 escher
 fidl
 fonts
@@ -27,6 +28,7 @@ libc-tests
 llvm-passes
 logging
 magenta
+magenta-rs
 magenta/benchmarks
 magma
 manifest
@@ -35,12 +37,13 @@ media
 modular
 modules
 mojo
-mojom
 mojo/public
+mojom
 moterm
 mozart
 msd-intel-gen
 mtl
+mxruntime
 native_viewport
 netstack
 network
@@ -100,4 +103,5 @@ tonic
 toyen
 tracing
 vapidssl
+xi
 zip
