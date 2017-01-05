@@ -83,11 +83,6 @@ def GenTests(api):
     )
 
     yield (
-        api.test('win64') +
-        api.platform('win', 64)
-    )
-
-    yield (
         api.test('install-failed') +
         api.step_data('install cipd', retcode=1)
     )

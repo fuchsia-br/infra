@@ -14,8 +14,8 @@ DEPS = [
 
 def RunSteps(api):
     # First, you need a go distribution.
-    api.go.install_go()
-    api.go.install_go(version='go1.6')
+    api.go.ensure_go()
+    api.go.ensure_go(version='go_version:1.6')
     assert api.go.go_executable
 
     # Build a go package.
@@ -49,9 +49,4 @@ def GenTests(api):
     yield (
         api.test('basic') +
         api.platform('linux', 64)
-    )
-
-    yield (
-        api.test('install-failed') +
-        api.step_data('install go', retcode=1)
     )

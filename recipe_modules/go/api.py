@@ -26,34 +26,19 @@ class GoApi(recipe_api.RecipeApi):
 
         return self.m.step(name, go_cmd + list(args or []), **kwargs)
 
-    def platform_suffix(self):
-        """Use to get distribution for the correct platform."""
-        return '%s-%s' % (
-            self.m.platform.name.replace('mac', 'darwin'),
-            {
-                32: '386',
-                64: 'amd64',
-            }[self.m.platform.bits],
-        )
-
-    def install_go(self, step_name='install go', version=None):
+    def ensure_go(self, version=None):
         """Ensures that go distribution is installed."""
-        assert version is None or version.startswith('go')
-        step = self.m.python(
-                name=step_name,
-                script=self.resource('bootstrap.py'),
-                args=[
-                    '--platform', self.platform_suffix(),
-                    '--dest-directory', self.m.path['slave_build'].join('go'),
-                    '--json-output', self.m.json.output(),
-                ] +
-                (['--version', version] if version else []),
-                step_test_data=lambda: self.test_api.example_install_go(version)
-            )
-        self._go_dir = step.json.output['path']
-        step.presentation.step_text = (
-                'Go version: %s' % step.json.output['version'])
-        return step
+        with self.m.step.nest('ensure_go'):
+            with self.m.step.context({'infra_step': True}):
+                self.m.cipd.install_client()
+                go_package = ('fuchsia/go/go/%s' %
+                    self.m.cipd.platform_suffix())
+                self._go_dir = self.m.path['start_dir'].join('cipd', 'go')
+
+                self.m.cipd.ensure(self._go_dir,
+                                   {go_package: version or 'release'})
+
+                return self._go_dir
 
     @property
     def go_executable(self):
