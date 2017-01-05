@@ -33,16 +33,21 @@ class CIPDTestApi(recipe_test_api.RecipeTestApi):
     def make_test_executable(self):
         return str(self.m.path['slave_build'].join('cipd', 'cipd'))
 
+    def make_test_version(self, v):
+        if v:
+            return v
+        return 'git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25'
+
     def example_error(self, error, retcode=None):
         return self._resultify(
             result=None,
             error=error,
             retcode=1 if retcode is None else retcode)
 
-    def example_install_client(self, package_name, version=None, retcode=None):
+    def example_install_client(self, version=None, retcode=None):
         return self.m.json.output({
             'executable': self.make_test_executable(),
-            'instance_id': self.make_resolved_version(version),
+            'version': self.make_test_version(version),
         }, retcode=retcode)
 
     def example_build(self, package_name, version=None):

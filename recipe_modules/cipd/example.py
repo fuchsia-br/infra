@@ -14,7 +14,7 @@ DEPS = [
 def RunSteps(api):
     # First, you need a cipd client.
     api.cipd.install_client('install cipd')
-    api.cipd.install_client('install cipd', version='deadbeaf')
+    api.cipd.install_client('install cipd', version='git_revision:f1234567890')
     assert api.cipd.get_executable()
 
     # Need to set service account credentials.

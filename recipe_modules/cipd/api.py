@@ -56,7 +56,7 @@ class CIPDApi(recipe_api.RecipeApi):
         self._cipd_executable = step.json.output['executable']
 
         step.presentation.step_text = (
-            'cipd instance_id: %s' % step.json.output['instance_id'])
+            'cipd version: %s' % step.json.output['version'])
         return step
 
     def get_executable(self):
