@@ -67,23 +67,20 @@ print jobs
     def ensure_goma(self, canary=False):
         with self.m.step.nest('ensure_goma'):
             with self.m.step.context({'infra_step': True}):
-                try:
-                    self.m.cipd.set_service_account_credentials(
-                        self.service_account_json_path)
+                self.m.cipd.set_service_account_credentials(
+                    self.service_account_json_path)
 
-                    self.m.cipd.install_client()
-                    goma_package = ('infra_internal/goma/client/%s' %
-                        self.m.cipd.platform_suffix())
-                    ref='release'
-                    if canary:
-                        ref='candidate'
-                    self._goma_dir = self.m.path['cache'].join('cipd', 'goma')
+                self.m.cipd.install_client()
+                goma_package = ('infra_internal/goma/client/%s' %
+                    self.m.cipd.platform_suffix())
+                ref='release'
+                if canary:
+                    ref='candidate'
+                self._goma_dir = self.m.path['start_dir'].join('cipd', 'goma')
 
-                    self.m.cipd.ensure(self._goma_dir, {goma_package: ref})
+                self.m.cipd.ensure(self._goma_dir, {goma_package: ref})
 
-                    return self._goma_dir
-                except self.m.step.StepFailure: # pragma: no cover
-                    return None
+                return self._goma_dir
 
     @property
     def goma_ctl(self):

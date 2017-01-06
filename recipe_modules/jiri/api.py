@@ -19,14 +19,19 @@ class JiriApi(recipe_api.RecipeApi):
         jiri_cmd = [self._jiri_executable]
         return self.m.step(name, jiri_cmd + list(args), **kwargs)
 
-    def ensure_jiri(self):
-        self.m.cipd.install_client()
-        jiri_package = ('fuchsia/tools/jiri/%s' %
-            self.m.cipd.platform_suffix())
-        cipd_dir = self.m.path['cache'].join('cipd')
-        self.m.cipd.ensure(cipd_dir, { jiri_package: 'latest' })
-        self._jiri_executable = cipd_dir.join('jiri')
-        return self._jiri_executable
+    def ensure_jiri(self, version=None):
+        with self.m.step.nest('ensure_jiri'):
+            with self.m.step.context({'infra_step': True}):
+                self.m.cipd.install_client()
+                jiri_package = ('fuchsia/tools/jiri/%s' %
+                    self.m.cipd.platform_suffix())
+                cipd_dir = self.m.path['start_dir'].join('cipd', 'jiri')
+
+                self.m.cipd.ensure(cipd_dir,
+                                   {jiri_package: version or 'latest'})
+                self._jiri_executable = cipd_dir.join('jiri')
+
+                return self._jiri_executable
 
     @property
     def jiri(self):
