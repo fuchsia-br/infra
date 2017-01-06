@@ -42,12 +42,21 @@ DST_REPO_NAME="${REPO_NAME//\//-}"
 cd "${TEMP_DIR}"
 git clone --mirror "${SRC_HOST}/${REPO_NAME}" "${DST_REPO_NAME}"
 
+REMOTE_URL="${DST_HOST}/${DST_REPO_NAME}"
+
 # Add a git remote to the destination host.
 cd "${DST_REPO_NAME}"
 cat >>config <<EOF
 [remote "gitsync"]
-  url = ${DST_HOST}/${DST_REPO_NAME}
+  url = ${REMOTE_URL}
 EOF
+
+# Check that the gitsync remote exists. If not attempt to create it.
+curl -I 2>/dev/null $REMOTE_URL | head -1 | grep 404 >/dev/null
+
+if [ $? == 0 ] ; then
+  curl -f -i -n -X POST --data '{"name":"'$REPO_NAME'","has_issues":false,"team_id": 2058456}' https://api.github.com/orgs/fuchsia-mirror/repos
+fi
 
 # Push to the destination.
 git push --mirror gitsync
