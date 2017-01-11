@@ -11,7 +11,7 @@
       "--platform",
       "linux-amd64",
       "--dest-directory",
-      "[SLAVE_BUILD]/cipd",
+      "[START_DIR]/cipd",
       "--json-output",
       "/path/to/tmp/json"
     ],
@@ -20,7 +20,7 @@
       "@@@STEP_NEST_LEVEL@1@@@",
       "@@@STEP_TEXT@cipd version: git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25@@@",
       "@@@STEP_LOG_LINE@json.output@{@@@",
-      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[SLAVE_BUILD]/cipd/cipd\", @@@",
+      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[START_DIR]/cipd/cipd\", @@@",
       "@@@STEP_LOG_LINE@json.output@  \"version\": \"git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25\"@@@",
       "@@@STEP_LOG_LINE@json.output@}@@@",
       "@@@STEP_LOG_END@json.output@@@"
@@ -28,7 +28,7 @@
   },
   {
     "cmd": [
-      "[SLAVE_BUILD]/cipd/cipd",
+      "[START_DIR]/cipd/cipd",
       "ensure",
       "--root",
       "[START_DIR]/cipd/go",
@@ -63,7 +63,7 @@
       "--platform",
       "linux-amd64",
       "--dest-directory",
-      "[SLAVE_BUILD]/cipd",
+      "[START_DIR]/cipd",
       "--json-output",
       "/path/to/tmp/json"
     ],
@@ -72,7 +72,7 @@
       "@@@STEP_NEST_LEVEL@1@@@",
       "@@@STEP_TEXT@cipd version: git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25@@@",
       "@@@STEP_LOG_LINE@json.output@{@@@",
-      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[SLAVE_BUILD]/cipd/cipd\", @@@",
+      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[START_DIR]/cipd/cipd\", @@@",
       "@@@STEP_LOG_LINE@json.output@  \"version\": \"git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25\"@@@",
       "@@@STEP_LOG_LINE@json.output@}@@@",
       "@@@STEP_LOG_END@json.output@@@"
@@ -80,7 +80,7 @@
   },
   {
     "cmd": [
-      "[SLAVE_BUILD]/cipd/cipd",
+      "[START_DIR]/cipd/cipd",
       "ensure",
       "--root",
       "[START_DIR]/cipd/go",

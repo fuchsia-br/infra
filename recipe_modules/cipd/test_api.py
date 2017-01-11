@@ -31,7 +31,7 @@ class CIPDTestApi(recipe_test_api.RecipeTestApi):
         return self.m.json.output(dic, retcode=retcode)
 
     def make_test_executable(self):
-        return str(self.m.path['slave_build'].join('cipd', 'cipd'))
+        return str(self.m.path['start_dir'].join('cipd', 'cipd'))
 
     def make_test_version(self, v):
         if v:

@@ -1,5 +1,9 @@
 [
   {
+    "cmd": [],
+    "name": "ensure_jiri"
+  },
+  {
     "cmd": [
       "python",
       "-u",
@@ -7,15 +11,16 @@
       "--platform",
       "linux-amd64",
       "--dest-directory",
-      "[SLAVE_BUILD]/cipd",
+      "[START_DIR]/cipd",
       "--json-output",
       "/path/to/tmp/json"
     ],
-    "name": "install cipd",
+    "name": "ensure_jiri.install cipd",
     "~followup_annotations": [
+      "@@@STEP_NEST_LEVEL@1@@@",
       "@@@STEP_TEXT@cipd version: git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25@@@",
       "@@@STEP_LOG_LINE@json.output@{@@@",
-      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[SLAVE_BUILD]/cipd/cipd\", @@@",
+      "@@@STEP_LOG_LINE@json.output@  \"executable\": \"[START_DIR]/cipd/cipd\", @@@",
       "@@@STEP_LOG_LINE@json.output@  \"version\": \"git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25\"@@@",
       "@@@STEP_LOG_LINE@json.output@}@@@",
       "@@@STEP_LOG_END@json.output@@@"
@@ -23,17 +28,18 @@
   },
   {
     "cmd": [
-      "[SLAVE_BUILD]/cipd/cipd",
+      "[START_DIR]/cipd/cipd",
       "ensure",
       "--root",
-      "[CACHE]/cipd",
+      "[START_DIR]/cipd/jiri",
       "--list",
       "fuchsia/tools/jiri/linux-amd64 latest",
       "--json-output",
       "/path/to/tmp/json"
     ],
-    "name": "ensure_installed",
+    "name": "ensure_jiri.ensure_installed",
     "~followup_annotations": [
+      "@@@STEP_NEST_LEVEL@1@@@",
       "@@@STEP_LOG_LINE@json.output@{@@@",
       "@@@STEP_LOG_LINE@json.output@  \"result\": [@@@",
       "@@@STEP_LOG_LINE@json.output@    {@@@",
@@ -47,7 +53,7 @@
   },
   {
     "cmd": [
-      "[CACHE]/cipd/jiri",
+      "[START_DIR]/cipd/jiri/jiri",
       "init",
       "-cache",
       "[CACHE]/jiri",
@@ -57,7 +63,7 @@
   },
   {
     "cmd": [
-      "[CACHE]/cipd/jiri",
+      "[START_DIR]/cipd/jiri/jiri",
       "import",
       "-overwrite=true",
       "minimal",
@@ -67,7 +73,7 @@
   },
   {
     "cmd": [
-      "[CACHE]/cipd/jiri",
+      "[START_DIR]/cipd/jiri/jiri",
       "update",
       "-autoupdate=false",
       "-gc=true",
@@ -77,7 +83,7 @@
   },
   {
     "cmd": [
-      "[CACHE]/cipd/jiri",
+      "[START_DIR]/cipd/jiri/jiri",
       "snapshot",
       "/path/to/tmp/"
     ],
@@ -94,7 +100,7 @@
   },
   {
     "cmd": [
-      "[CACHE]/cipd/jiri",
+      "[START_DIR]/cipd/jiri/jiri",
       "project",
       "info",
       "-json-output",
@@ -121,7 +127,7 @@
   },
   {
     "cmd": [
-      "[CACHE]/cipd/jiri",
+      "[START_DIR]/cipd/jiri/jiri",
       "patch",
       "-host",
       "https://fuchsia-review.googlesource.com",
@@ -133,7 +139,7 @@
   },
   {
     "cmd": [
-      "[CACHE]/cipd/jiri",
+      "[START_DIR]/cipd/jiri/jiri",
       "project",
       "clean",
       "-branches=true"
