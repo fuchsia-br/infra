@@ -14,7 +14,6 @@ DEPS = [
 
 def RunSteps(api):
     # First, ensure we have jiri.
-    api.jiri.set_config(api.properties.get('config'))
     api.jiri.ensure_jiri()
     assert api.jiri.jiri
 
@@ -47,8 +46,3 @@ def RunSteps(api):
 
 def GenTests(api):
     yield api.test('basic')
-    for config in ('jiri', 'magenta', 'fuchsia'):
-      yield (
-          api.test('basic_%s' % config) +
-          api.properties(config=config)
-      )
