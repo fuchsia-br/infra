@@ -13,10 +13,11 @@ DEPS = [
 
 
 def RunSteps(api):
-    url = 'https://fuchsia.googlesource.com/manifest'
+    url = 'https://fuchsia.googlesource.com/fuchsia.git'
 
     api.git.checkout(
         url,
+        path=api.properties.get('path'),
         ref=api.properties.get('revision'),
         remote=api.properties.get('remote'),
         file=api.properties.get('checkout_file'))
@@ -30,6 +31,7 @@ def RunSteps(api):
 
 def GenTests(api):
     yield api.test('basic')
+    yield api.test('basic_path') + api.properties(path=api.path['start_dir'].join('foo'))
     yield api.test('basic_ref') + api.properties(revision='refs/foo/bar')
     yield api.test('basic_branch') + api.properties(revision='refs/heads/testing')
     yield api.test('basic_hash') + api.properties(

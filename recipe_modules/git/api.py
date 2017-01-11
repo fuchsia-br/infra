@@ -27,8 +27,27 @@ class GitApi(recipe_api.RecipeApi):
             git_cmd.extend(['-c', '%s=%s' % (k, v)])
         return self.m.step(name, git_cmd + list(args), **kwargs)
 
-    def checkout(self, url, ref=None, remote=None, file=None, **kwargs):
+    def checkout(self, url, path=None, ref=None, remote=None, file=None, **kwargs):
         """Checkout a given ref and return the checked out revision."""
+        if not path:
+            path = url.rsplit('/', 1)[-1]
+            if path.endswith('.git'):  # https://host/foobar.git
+                path = path[:-len('.git')]
+            path = path or path.rsplit('/', 1)[-1] # ssh://host:repo/foobar/.git
+            path = self.m.path['start_dir'].join(path)
+
+        if 'checkout' not in self.m.path:
+            self.m.path['checkout'] = path
+
+        if not self.m.path.exists(path):
+            self.m.shutil.makedirs('makedirs', path)
+
+        if self.m.path.exists(path.join('.git')): # pragma: no cover
+            self('config', '--remove-section', 'remote.%s' % remote, **kwargs)
+        else:
+            self('init', path, **kwargs)
+        self('remote', 'add', remote or 'origin', url)
+
         if not ref:
             fetch_ref = self.m.properties.get('branch') or 'master'
             checkout_ref = 'FETCH_HEAD'

@@ -4,7 +4,7 @@
       "python",
       "-u",
       "\nimport sys, os\npath = sys.argv[1]\nmode = int(sys.argv[2])\nif not os.path.isdir(path):\n  if os.path.exists(path):\n    print \"%s exists but is not a dir\" % path\n    sys.exit(1)\n  os.makedirs(path, mode)\n",
-      "[START_DIR]/fuchsia",
+      "[START_DIR]/foo",
       "511"
     ],
     "name": "makedirs makedirs",
@@ -25,9 +25,9 @@
     "cmd": [
       "git",
       "init",
-      "[START_DIR]/fuchsia"
+      "[START_DIR]/foo"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git init"
   },
   {
@@ -38,16 +38,16 @@
       "origin",
       "https://fuchsia.googlesource.com/fuchsia.git"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git remote"
   },
   {
     "cmd": [
       "git",
       "fetch",
-      "testing"
+      "master"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git fetch"
   },
   {
@@ -57,7 +57,7 @@
       "-f",
       "FETCH_HEAD"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git checkout"
   },
   {
@@ -66,7 +66,7 @@
       "rev-parse",
       "HEAD"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git rev-parse",
     "stdout": "/path/to/tmp/"
   },
@@ -78,7 +78,7 @@
       "-d",
       "-x"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git clean"
   },
   {
@@ -89,7 +89,7 @@
       "--format=%H",
       "-s"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git show",
     "stdout": "/path/to/tmp/"
   },
@@ -101,7 +101,7 @@
       "--format=%at",
       "-s"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git show (2)",
     "stdout": "/path/to/tmp/"
   },
@@ -112,7 +112,7 @@
       "foo=bar",
       "status"
     ],
-    "cwd": "[START_DIR]/fuchsia",
+    "cwd": "[START_DIR]/foo",
     "name": "git status"
   },
   {
