@@ -52,9 +52,9 @@ cat >>config <<EOF
 EOF
 
 # Check that the gitsync remote exists. If not attempt to create it.
-curl -I 2>/dev/null $REMOTE_URL | head -1 | grep 404 >/dev/null
+curl -s -f >/dev/null $REMOTE_URL
 
-if [ $? == 0 ] ; then
+if [ $? -ne 0 ] ; then
   curl -f -i -n -X POST --data '{"name":"'$REPO_NAME'","has_issues":false,"team_id": 2058456}' https://api.github.com/orgs/fuchsia-mirror/repos
 fi
 
