@@ -56,7 +56,7 @@
       "[START_DIR]/cipd/jiri/jiri",
       "init",
       "-cache",
-      "[CACHE]/jiri",
+      "[CACHE]/git",
       "dir"
     ],
     "name": "jiri init"
