@@ -34,10 +34,8 @@ TARGETS = {
         ('fuchsia/drivers-linux-arm64-release', 'linux-arm64-release')
     ],
     'magenta': [
-        ('magenta/arm32-linux-gcc', 'arm32-linux-gcc'),
         ('magenta/arm64-linux-gcc', 'arm64-linux-gcc'),
         ('magenta/x86-64-linux-gcc', 'x86-64-linux-gcc'),
-        ('magenta/arm32-linux-clang', 'arm32-linux-clang'),
         ('magenta/arm64-linux-clang', 'arm64-linux-clang'),
         ('magenta/x86-64-linux-clang', 'x86-64-linux-clang')
     ],
