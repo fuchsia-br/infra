@@ -19,6 +19,7 @@ fuchsia
 gerrit/verified-projects
 gigaboot20x6
 infra
+init
 jiri
 jiri/version
 json
