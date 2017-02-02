@@ -30,7 +30,6 @@ class GoApi(recipe_api.RecipeApi):
         """Ensures that go distribution is installed."""
         with self.m.step.nest('ensure_go'):
             with self.m.step.context({'infra_step': True}):
-                self.m.cipd.install_client()
                 go_package = ('fuchsia/go/go/%s' %
                     self.m.cipd.platform_suffix())
                 self._go_dir = self.m.path['start_dir'].join('cipd', 'go')

@@ -12,12 +12,7 @@ DEPS = [
 
 
 def RunSteps(api):
-    # First, you need a cipd client.
-    api.cipd.install_client('install cipd')
-    api.cipd.install_client('install cipd', version='git_revision:f1234567890')
-    assert api.cipd.get_executable()
-
-    # Need to set service account credentials.
+    # Set the service account credentials if needed.
     api.cipd.set_service_account_credentials(
         api.cipd.default_bot_service_account_credentials)
 
@@ -80,11 +75,6 @@ def GenTests(api):
     yield (
         api.test('mac64') +
         api.platform('mac', 64)
-    )
-
-    yield (
-        api.test('install-failed') +
-        api.step_data('install cipd', retcode=1)
     )
 
     yield (

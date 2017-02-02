@@ -70,7 +70,6 @@ print jobs
                 self.m.cipd.set_service_account_credentials(
                     self.service_account_json_path)
 
-                self.m.cipd.install_client()
                 goma_package = ('infra_internal/goma/client/%s' %
                     self.m.cipd.platform_suffix())
                 ref='release'

@@ -30,25 +30,11 @@ class CIPDTestApi(recipe_test_api.RecipeTestApi):
             dic['error'] = error
         return self.m.json.output(dic, retcode=retcode)
 
-    def make_test_executable(self):
-        return str(self.m.path['start_dir'].join('cipd', 'cipd'))
-
-    def make_test_version(self, v):
-        if v:
-            return v
-        return 'git_revision:05844bd9d1200cba8449b936b76e25eb90eabe25'
-
     def example_error(self, error, retcode=None):
         return self._resultify(
             result=None,
             error=error,
             retcode=1 if retcode is None else retcode)
-
-    def example_install_client(self, version=None, retcode=None):
-        return self.m.json.output({
-            'executable': self.make_test_executable(),
-            'version': self.make_test_version(version),
-        }, retcode=retcode)
 
     def example_build(self, package_name, version=None):
         return self._resultify(self.make_pin(package_name, version))

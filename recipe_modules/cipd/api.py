@@ -11,8 +11,6 @@ class CIPDApi(recipe_api.RecipeApi):
 
     def __init__(self, *args, **kwargs):
         super(CIPDApi, self).__init__(*args, **kwargs)
-        self._cipd_executable = None
-        self._cipd_version = None
         self._cipd_credentials = None
     
     def set_service_account_credentials(self, path):
@@ -37,39 +35,13 @@ class CIPDApi(recipe_api.RecipeApi):
             }[self.m.platform.bits],
         )
 
-    def install_client(self, step_name='install cipd', version=None):
-        """Ensures the client is installed.
-
-        If you specify version as a hash, make sure its correct platform.
-        """
-        step = self.m.python(
-            name=step_name,
-            script=self.resource('bootstrap.py'),
-            args=[
-                '--platform', self.platform_suffix(),
-                '--dest-directory', self.m.path['start_dir'].join('cipd'),
-                '--json-output', self.m.json.output(),
-            ] +
-            (['--version', version] if version else []),
-            step_test_data=lambda: self.test_api.example_install_client(version)
-        )
-        self._cipd_executable = step.json.output['executable']
-
-        step.presentation.step_text = (
-            'cipd version: %s' % step.json.output['version'])
-        return step
-
-    def get_executable(self):
-        return self._cipd_executable
-
     def build(self, input_dir, output_package, package_name, install_mode=None):
-        assert self._cipd_executable
         assert not install_mode or install_mode in ['copy', 'symlink']
 
         return self.m.step(
             'build %s' % self.m.path.basename(package_name),
             [
-                self._cipd_executable,
+                'cipd',
                 'pkg-build',
                 '--in', input_dir,
                 '--name', package_name,
@@ -82,10 +54,8 @@ class CIPDApi(recipe_api.RecipeApi):
         )
 
     def register(self, package_name, package_path, refs=None, tags=None):
-        assert self._cipd_executable
-
         cmd = [
-            self._cipd_executable,
+            'cipd',
             'pkg-register', package_path,
             '--json-output', self.m.json.output(),
         ]
@@ -108,9 +78,8 @@ class CIPDApi(recipe_api.RecipeApi):
 
         This builds and uploads the package in one step.
         """
-        assert self._cipd_executable
         cmd = [
-            self._cipd_executable,
+            'cipd'
             'create',
             '--pkg-def', pkg_def,
             '--json-output', self.m.json.output(),
@@ -135,13 +104,11 @@ class CIPDApi(recipe_api.RecipeApi):
         If installing a package requires credentials, call
         ``set_service_account_credentials`` before calling this function.
         """
-        assert self._cipd_executable
-
         package_list = ['%s %s' % (name, version)
                         for name, version in sorted(packages.items())]
         list_data = self.m.raw_io.input('\n'.join(package_list))
         cmd = [
-            self._cipd_executable,
+            'cipd',
             'ensure',
             '--root', root,
             '--list', list_data,
@@ -155,10 +122,8 @@ class CIPDApi(recipe_api.RecipeApi):
         )
 
     def set_tag(self, package_name, version, tags):
-        assert self._cipd_executable
-
         cmd = [
-            self._cipd_executable,
+            'cipd',
             'set-tag', package_name,
             '--version', version,
             '--json-output', self.m.json.output(),
@@ -177,10 +142,8 @@ class CIPDApi(recipe_api.RecipeApi):
         )
 
     def set_ref(self, package_name, version, refs):
-        assert self._cipd_executable
-
         cmd = [
-            self._cipd_executable,
+            'cipd',
             'set-ref', package_name,
             '--version', version,
             '--json-output', self.m.json.output(),
@@ -199,11 +162,10 @@ class CIPDApi(recipe_api.RecipeApi):
         )
 
     def search(self, package_name, tag):
-        assert self._cipd_executable
         assert ':' in tag, 'tag must be in a form "k:v"'
 
         cmd = [
-            self._cipd_executable,
+            'cipd',
             'search', package_name,
             '--tag', tag,
             '--json-output', self.m.json.output(),
@@ -219,10 +181,8 @@ class CIPDApi(recipe_api.RecipeApi):
 
     def describe(self, package_name, version,
                  test_data_refs=None, test_data_tags=None):
-        assert self._cipd_executable
-
         cmd = [
-            self._cipd_executable,
+            'cipd',
             'describe', package_name,
             '--version', version,
             '--json-output', self.m.json.output(),
