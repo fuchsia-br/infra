@@ -81,13 +81,16 @@ class MainPage(webapp2.RequestHandler):
 
     @staticmethod
     def getBuildResult(target):
-        resp = urlfetch.fetch(BASE_URL + target)
-        if resp.status_code != 200:
+        try:
+            resp = urlfetch.fetch(BASE_URL + target, deadline=5)
+            if resp.status_code != 200:
+                return BuildResult.ServerError
+            parser = LuciResultParser()
+            parser.feed(resp.content)
+            parser.close()
+            return parser.result
+        except urlfetch.Error:
             return BuildResult.ServerError
-        parser = LuciResultParser()
-        parser.feed(resp.content)
-        parser.close()
-        return parser.result
 
     def get(self):
         template_values = {
