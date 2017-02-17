@@ -89,7 +89,7 @@ class MainPage(webapp2.RequestHandler):
             parser.feed(resp.content)
             parser.close()
             return parser.result
-        except urlfetch.Error:
+        except:
             return BuildResult.ServerError
 
     def get(self):
