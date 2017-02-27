@@ -130,6 +130,7 @@ third_party/murmurhash.c
 third_party/netstack
 third_party/ninja
 third_party/pixman
+third_party/processor-trace
 third_party/pkg/errors
 third_party/qcms
 third_party/qemu
