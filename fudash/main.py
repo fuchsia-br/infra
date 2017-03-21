@@ -22,16 +22,16 @@ BASE_URL = 'https://luci-scheduler.appspot.com/jobs/'
 
 TARGETS = {
     'fuchsia': [
-        ('fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'),
-        ('fuchsia/linux-arm64-debug', 'linux-arm64-debug'),
-        ('fuchsia/linux-x86-64-release', 'linux-x86-64-release'),
-        ('fuchsia/linux-arm64-release', 'linux-arm64-release')
+        ('manifest/linux-x86-64-debug', 'linux-x86-64-debug'),
+        ('manifest/linux-arm64-debug', 'linux-arm64-debug'),
+        ('manifest/linux-x86-64-release', 'linux-x86-64-release'),
+        ('manifest/linux-arm64-release', 'linux-arm64-release')
     ],
     'fuchsia-drivers': [
-        ('fuchsia/drivers-linux-x86-64-debug', 'linux-x86-64-debug'),
-        ('fuchsia/drivers-linux-arm64-debug', 'linux-arm64-debug'),
-        ('fuchsia/drivers-linux-x86-64-release', 'linux-x86-64-release'),
-        ('fuchsia/drivers-linux-arm64-release', 'linux-arm64-release')
+        ('manifest/drivers-linux-x86-64-debug', 'linux-x86-64-debug'),
+        ('manifest/drivers-linux-arm64-debug', 'linux-arm64-debug'),
+        ('manifest/drivers-linux-x86-64-release', 'linux-x86-64-release'),
+        ('manifest/drivers-linux-arm64-release', 'linux-arm64-release')
     ],
     'magenta': [
         ('magenta/arm64-linux-gcc', 'arm64-linux-gcc'),
