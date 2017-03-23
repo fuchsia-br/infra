@@ -3,14 +3,11 @@ atom-language-fidl
 bluetooth
 build
 buildtools
-calendar
-chat
 clang-plugin
 cmdutils
 cobalt
 component_manager
 compositor
-contacts
 dart_content_handler
 docs
 document-store
@@ -19,7 +16,6 @@ drivers/gpu/msd-intel-gen
 drivers/wifi
 dumbsync
 dynamic_bindings
-email
 escher
 fidl
 fonts
@@ -54,7 +50,6 @@ manifest
 maxwell
 media
 modular
-modules
 modules/calendar
 modules/chat
 modules/common
