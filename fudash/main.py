@@ -22,26 +22,26 @@ BASE_URL = 'https://luci-scheduler.appspot.com/jobs/'
 
 TARGETS = {
     'fuchsia': [
-        ('manifest/linux-x86-64-debug', 'linux-x86-64-debug'),
-        ('manifest/linux-arm64-debug', 'linux-arm64-debug'),
-        ('manifest/linux-x86-64-release', 'linux-x86-64-release'),
-        ('manifest/linux-arm64-release', 'linux-arm64-release')
+        ('fuchsia/fuchsia-aarch64-linux-debug', 'fuchsia-aarch64-linux-debug'),
+        ('fuchsia/fuchsia-aarch64-linux-release', 'fuchsia-aarch64-linux-release'),
+        ('fuchsia/fuchsia-x86_64-linux-debug', 'fuchsia-x86_64-linux-debug'),
+        ('fuchsia/fuchsia-x86_64-linux-release', 'fuchsia-x86_64-linux-release'),
     ],
     'fuchsia-drivers': [
-        ('manifest/drivers-linux-x86-64-debug', 'linux-x86-64-debug'),
-        ('manifest/drivers-linux-arm64-debug', 'linux-arm64-debug'),
-        ('manifest/drivers-linux-x86-64-release', 'linux-x86-64-release'),
-        ('manifest/drivers-linux-arm64-release', 'linux-arm64-release')
+        ('fuchsia/drivers-aarch64-linux-debug', 'drivers-aarch64-linux-debug'),
+        ('fuchsia/drivers-aarch64-linux-release', 'drivers-aarch64-linux-release'),
+        ('fuchsia/drivers-x86_64-linux-debug', 'drivers-x86_64-linux-debug'),
+        ('fuchsia/drivers-x86_64-linux-release', 'drivers-x86_64-linux-release'),
     ],
     'magenta': [
-        ('magenta/arm64-linux-gcc', 'arm64-linux-gcc'),
-        ('magenta/x86-64-linux-gcc', 'x86-64-linux-gcc'),
-        ('magenta/arm64-linux-clang', 'arm64-linux-clang'),
-        ('magenta/x86-64-linux-clang', 'x86-64-linux-clang')
+        ('fuchsia/magenta-aarch64-linux-clang', 'magenta-aarch64-linux-clang'),
+        ('fuchsia/magenta-aarch64-linux-gcc', 'magenta-aarch64-linux-gcc'),
+        ('fuchsia/magenta-x86_64-linux-clang', 'magenta-x86_64-linux-clang'),
+        ('fuchsia/magenta-x86_64-linux-gcc', 'magenta-x86_64-linux-gcc'),
     ],
     'jiri': [
-        ('jiri/linux-x86-64', 'linux-x86-64'),
-        ('jiri/mac-x86-64', 'mac-x86-64')
+        ('fuchsia/jiri-x86_64-linux', 'jiri-x86_64-linux'),
+        ('fuchsia/jiri-x86_64-mac', 'jiri-x86_64-mac'),
     ]
 }
 
