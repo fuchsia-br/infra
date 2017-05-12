@@ -19,6 +19,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True)
 
 BASE_URL = 'https://luci-scheduler.appspot.com/jobs/'
+SNAPSHOT_URL = 'https://storage.googleapis.com/fuchsia/jiri/snapshots'
 
 TARGETS = {
     'fuchsia': [
@@ -45,6 +46,7 @@ TARGETS = {
     ]
 }
 
+
 class BuildResult:
     """This is an enum of sorts, except the values match css class names."""
     Pass = "pass"
@@ -52,12 +54,15 @@ class BuildResult:
     ServerError = "server_error"
     ParserError = "parser_error"
 
+
 class LuciResultParser(HTMLParser):
     """Parses the HTML of the LUCI scheduler page to get the build results."""
 
-    def __init__(self):
+    def __init__(self, success_only=False):
         HTMLParser.__init__(self)
+        self.success_only = success_only
         self.parsing_invocations = False
+        self.parsing_row = False
         self.stop_parsing = False
         self.result = BuildResult.ParserError
 
@@ -69,28 +74,67 @@ class LuciResultParser(HTMLParser):
                     self.parsing_invocations = True
         elif tag == 'tr' and self.parsing_invocations:
             for k, v in attrs:
-                if k == 'class' and v == 'danger':
+                if k == 'class' and v == 'danger' and not self.success_only:
                     self.result = BuildResult.Fail
-                    self.stop_parsing = True
+                    self.parsing_invocations = False
+                    self.parsing_row = True
                 if k == 'class' and v == 'success':
                     self.result = BuildResult.Pass
+                    self.parsing_invocations = False
+                    self.parsing_row = True
+        elif tag == 'a' and self.parsing_row:
+            for k, v in attrs:
+                if k == 'href':
+                    self.link = v
+                if k == 'class' and 'label' in v:
                     self.stop_parsing = True
+
+
+def getBuildResult(target, success_only=False):
+    try:
+        resp = urlfetch.fetch(BASE_URL + target, deadline=5)
+        if resp.status_code != 200:
+            return BuildResult.ServerError, '#'
+        parser = LuciResultParser(success_only)
+        parser.feed(resp.content)
+        parser.close()
+        return parser.result, parser.link
+    except:
+        return BuildResult.ServerError, '#'
+
+
+class MiloResultParser(HTMLParser):
+    """Parses the HTML of the Milo steps to get the snapshot link."""
+
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.stop_parsing = False
+        self.link = None
+
+    def handle_starttag(self, tag, attrs):
+        if self.stop_parsing: return
+        if tag == 'a':
+            for k, v in attrs:
+                if k == 'href' and v.startswith(SNAPSHOT_URL):
+                    self.link = v
+                    self.stop_parsing= True
+
+
+def getSnapshot(href):
+    try:
+        resp = urlfetch.fetch(href, deadline=5)
+        if resp.status_code != 200:
+            return BuildResult.ServerError
+        parser = MiloResultParser()
+        parser.feed(resp.content)
+        parser.close()
+        return parser.link
+    except:
+        return BuildResult.ServerError
+
 
 class MainPage(webapp2.RequestHandler):
     """The main handler."""
-
-    @staticmethod
-    def getBuildResult(target):
-        try:
-            resp = urlfetch.fetch(BASE_URL + target, deadline=5)
-            if resp.status_code != 200:
-                return BuildResult.ServerError
-            parser = LuciResultParser()
-            parser.feed(resp.content)
-            parser.close()
-            return parser.result
-        except:
-            return BuildResult.ServerError
 
     def get(self):
         template_values = {
@@ -102,10 +146,11 @@ class MainPage(webapp2.RequestHandler):
             for job in TARGETS[t]:
                 url_suffix = job[0]
                 display_name = job[1]
+                result, link = getBuildResult(url_suffix)
                 result = {
                     'name': display_name,
-                    'result': MainPage.getBuildResult(url_suffix),
-                    'href': BASE_URL + url_suffix,
+                    'result': result,
+                    'href': link,
                 }
                 build_jobs.append(result)
             target = {
@@ -118,6 +163,22 @@ class MainPage(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 
+class SnapshotPage(webapp2.RequestHandler):
+    """The snapshot handler."""
+
+    def get(self, target):
+        snapshot_found = False
+        for t in sorted(TARGETS):
+            for j in TARGETS[t]:
+                if target == j[1]:
+                    result, link = getBuildResult(j[0], True)
+                    self.redirect(getSnapshot(link))
+                    snapshot_found = True
+        if not snapshot_found:
+            self.abort(404)
+
+
 app = webapp2.WSGIApplication([
         ('/', MainPage),
+        (r'/lkgs/([a-z0-9-_]+)', SnapshotPage),
 ], debug=True)
