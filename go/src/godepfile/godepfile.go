@@ -32,11 +32,13 @@ func (v *stringsFlag) Set(s string) error {
 var (
 	ctx    = build.Default
 	output string
+	test   bool
 )
 
 func init() {
 	flag.Var((*stringsFlag)(&ctx.BuildTags), "tags", "build tags")
 	flag.StringVar(&output, "o", "", "name of the resulting executable")
+	flag.BoolVar(&test, "test", false, "whether this is a test target")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: godepfile [packages]\n")
@@ -95,6 +97,11 @@ func main() {
 		files = appendAndPrefix(files, srcdir, pkg.SFiles)
 		files = appendAndPrefix(files, srcdir, pkg.SwigFiles)
 		files = appendAndPrefix(files, srcdir, pkg.SwigCXXFiles)
+
+		if test {
+			files = appendAndPrefix(files, srcdir, pkg.TestGoFiles)
+			files = appendAndPrefix(files, srcdir, pkg.XTestGoFiles)
+		}
 
 		mu.Lock()
 		for _, file := range files {
