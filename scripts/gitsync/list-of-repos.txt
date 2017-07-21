@@ -75,6 +75,7 @@ moterm
 mozart
 msd-intel-gen
 mtl
+mxio-rs
 mxruntime
 native_viewport
 netconnector
