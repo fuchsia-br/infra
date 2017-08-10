@@ -40,16 +40,22 @@ DST_REPO_NAME="${REPO_NAME//\//-}"
 
 # Pull down the source host.
 cd "${TEMP_DIR}"
-git clone --mirror "${SRC_HOST}/${REPO_NAME}" "${DST_REPO_NAME}"
-
-REMOTE_URL="${DST_HOST}/${DST_REPO_NAME}"
+mkdir "${DST_REPO_NAME}"
+cd "${DST_REPO_NAME}"
+git init .
+git config core.bare true
+git remote add origin "${SRC_HOST}/${REPO_NAME}"
+git config remote.origin.mirror true
+# We want to fetch all remote heads and tags, but not everything.
+# In particular, we don't want to mirror refs/changes/*
+git config remote.origin.fetch '+refs/heads/*:refs/heads/*'
+git config --add remote.origin.fetch '+refs/tags/*:refs/tags/*'
 
 # Add a git remote to the destination host.
-cd "${DST_REPO_NAME}"
-cat >>config <<EOF
-[remote "gitsync"]
-  url = ${REMOTE_URL}
-EOF
+REMOTE_URL="${DST_HOST}/${DST_REPO_NAME}"
+git remote add gitsync "${REMOTE_URL}"
+git config remote.gitsync.mirror true
+git remote update
 
 # Check that the gitsync remote exists. If not attempt to create it.
 curl -s -f >/dev/null $REMOTE_URL
@@ -59,4 +65,4 @@ if [ $? -ne 0 ] ; then
 fi
 
 # Push to the destination.
-git push --mirror gitsync
+git push gitsync
