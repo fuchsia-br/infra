@@ -35,10 +35,12 @@ TARGETS = {
         ('fuchsia/drivers-x86_64-linux-release', 'drivers-x86_64-linux-release'),
     ],
     'magenta': [
-        ('fuchsia/magenta-qemu-arm64-clang', 'magenta-qemu-arm64-clang'),
-        ('fuchsia/magenta-qemu-arm64-gcc', 'magenta-qemu-arm64-gcc'),
         ('fuchsia/magenta-pc-x86-64-clang', 'magenta-pc-x86-64-clang'),
         ('fuchsia/magenta-pc-x86-64-gcc', 'magenta-pc-x86-64-gcc'),
+        ('fuchsia/magenta-pc-x86-64-asan', 'magenta-pc-x86-64-asan'),
+        ('fuchsia/magenta-qemu-arm64-clang', 'magenta-qemu-arm64-clang'),
+        ('fuchsia/magenta-qemu-arm64-gcc', 'magenta-qemu-arm64-gcc'),
+        ('fuchsia/magenta-qemu-arm64-asan', 'magenta-qemu-arm64-asan'),
     ],
     'jiri': [
         ('fuchsia/jiri-x86_64-linux', 'jiri-x86_64-linux'),
