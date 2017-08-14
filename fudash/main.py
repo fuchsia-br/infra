@@ -37,9 +37,11 @@ TARGETS = {
     'magenta': [
         ('fuchsia/magenta-pc-x86-64-clang', 'magenta-pc-x86-64-clang'),
         ('fuchsia/magenta-pc-x86-64-gcc', 'magenta-pc-x86-64-gcc'),
-        ('fuchsia/magenta-pc-x86-64-asan', 'magenta-pc-x86-64-asan'),
         ('fuchsia/magenta-qemu-arm64-clang', 'magenta-qemu-arm64-clang'),
         ('fuchsia/magenta-qemu-arm64-gcc', 'magenta-qemu-arm64-gcc'),
+    ],
+    'fyi': [
+        ('fuchsia/magenta-pc-x86-64-asan', 'magenta-pc-x86-64-asan'),
         ('fuchsia/magenta-qemu-arm64-asan', 'magenta-qemu-arm64-asan'),
     ],
     'jiri': [
