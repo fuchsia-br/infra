@@ -30,6 +30,7 @@ fonts
 fortune
 ftl
 fuchsia
+garnet
 gdbserver
 gerrit/commit-queue-projects
 gerrit/verified-projects
