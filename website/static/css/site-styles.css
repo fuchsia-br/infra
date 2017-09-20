@@ -1,0 +1,57 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  margin:0;
+}
+
+header {
+  font-size: 48px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+header a {
+  text-decoration: none;
+}
+
+header img {
+  width: 120px;
+  margin-right:12px;
+}
+
+.site {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+#content {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+aside {
+  margin: 12px 0;
+  width: 200px;
+}
+
+main {
+  flex: 1;
+  padding: 8px;
+}
+
+footer {
+  padding: 16px;
+  background: #eee;
+}
+
+.active {
+  font-weight: bold;
+}
+
+iframe.dashboard {
+  width: 100%;
+  height: 60vh;
+  border:0;
+}
