@@ -1,22 +1,24 @@
 <html>
+
 <head>
-    <link rel="stylesheet" href="main.css">
-    <meta http-equiv="refresh" content="60">
-    <title>Fuchsia Build Dashboard</title>
+  <link rel="stylesheet" href="main.css">
+  <meta http-equiv="refresh" content="60">
+  <title>Fuchsia Build Dashboard</title>
 </head>
+
 <body>
-{% for target in targets %}
-  <h1> {{target.project}} </h1>
-  <ul class="target-container">
-      {% for build_job in target.build_jobs %}
-      <li class="{{build_job.result}}">
-        <a href="{{build_job.href}}">
-          <span class="target-name">{{build_job.name}}</span>
-        </a>
-      </li>
-      {% endfor %}
-  </ul>
-{% endfor %}
-<div class="clock">{{clock}}</div>
+  {% for target in targets %}
+  <div class="target-container">
+    {% for build_job in target.build_jobs %}
+    <a href="{{build_job.href}}">
+      <div class="{{build_job.result}}">
+        <span class="target-name">{{build_job.name}}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endfor %}
+  <div class="clock">{{clock}}</div>
 </body>
+
 </html>

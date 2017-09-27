@@ -21,34 +21,53 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 BASE_URL = 'https://luci-scheduler.appspot.com/jobs/'
 SNAPSHOT_URL = 'https://storage.googleapis.com/fuchsia/jiri/snapshots'
 
-TARGETS = {
-    'fuchsia': [
+TARGETS = [
+    [
+        ('fuchsia'),
         ('fuchsia/fuchsia-aarch64-linux-debug', 'fuchsia-aarch64-linux-debug'),
         ('fuchsia/fuchsia-aarch64-linux-release', 'fuchsia-aarch64-linux-release'),
         ('fuchsia/fuchsia-x86_64-linux-debug', 'fuchsia-x86_64-linux-debug'),
         ('fuchsia/fuchsia-x86_64-linux-release', 'fuchsia-x86_64-linux-release'),
     ],
-    'fuchsia-drivers': [
-        ('fuchsia/drivers-aarch64-linux-debug', 'drivers-aarch64-linux-debug'),
-        ('fuchsia/drivers-aarch64-linux-release', 'drivers-aarch64-linux-release'),
-        ('fuchsia/drivers-x86_64-linux-debug', 'drivers-x86_64-linux-debug'),
-        ('fuchsia/drivers-x86_64-linux-release', 'drivers-x86_64-linux-release'),
+    [
+        ('topaz'),
+        ('fuchsia/topaz-aarch64-linux-debug', 'topaz-aarch64-linux-debug'),
+        ('fuchsia/topaz-aarch64-linux-release', 'topaz-aarch64-linux-release'),
+        ('fuchsia/topaz-x86_64-linux-debug', 'topaz-x86_64-linux-debug'),
+        ('fuchsia/topaz-x86_64-linux-release', 'topaz-x86_64-linux-release'),
     ],
-    'zircon': [
+    [
+        ('peridot'),
+        ('fuchsia/peridot-aarch64-linux-debug', 'peridot-aarch64-linux-debug'),
+        ('fuchsia/peridot-aarch64-linux-release', 'peridot-aarch64-linux-release'),
+        ('fuchsia/peridot-x86_64-linux-debug', 'peridot-x86_64-linux-debug'),
+        ('fuchsia/peridot-x86_64-linux-release', 'peridot-x86_64-linux-release'),
+    ],
+    [
+        ('garnet'),
+        ('fuchsia/garnet-aarch64-linux-debug', 'garnet-aarch64-linux-debug'),
+        ('fuchsia/garnet-aarch64-linux-release', 'garnet-aarch64-linux-release'),
+        ('fuchsia/garnet-x86_64-linux-debug', 'garnet-x86_64-linux-debug'),
+        ('fuchsia/garnet-x86_64-linux-release', 'garnet-x86_64-linux-release'),
+    ],
+    [
+        ('zircon'),
         ('fuchsia/zircon-pc-x86-64-clang', 'zircon-pc-x86-64-clang'),
         ('fuchsia/zircon-pc-x86-64-gcc', 'zircon-pc-x86-64-gcc'),
         ('fuchsia/zircon-qemu-arm64-clang', 'zircon-qemu-arm64-clang'),
         ('fuchsia/zircon-qemu-arm64-gcc', 'zircon-qemu-arm64-gcc'),
     ],
-    'fyi': [
-        ('fuchsia/zircon-pc-x86-64-asan', 'zircon-pc-x86-64-asan'),
-        ('fuchsia/zircon-qemu-arm64-asan', 'zircon-qemu-arm64-asan'),
-    ],
-    'jiri': [
+    [
+        ('jiri'),
         ('fuchsia/jiri-x86_64-linux', 'jiri-x86_64-linux'),
         ('fuchsia/jiri-x86_64-mac', 'jiri-x86_64-mac'),
+    ],
+    [
+        ('fyi'),
+        ('fuchsia/zircon-pc-x86-64-asan', 'zircon-pc-x86-64-asan'),
+        ('fuchsia/zircon-qemu-arm64-asan', 'zircon-qemu-arm64-asan'),
     ]
-}
+]
 
 
 class BuildResult:
@@ -145,9 +164,11 @@ class MainPage(webapp2.RequestHandler):
             'clock': time.strftime("%H:%M UTC", time.gmtime()),
             'targets': [],
         }
-        for t in sorted(TARGETS):
+        for t in TARGETS:
             build_jobs = []
-            for job in TARGETS[t]:
+            project = t[0]
+            job_targets = t[1:]
+            for job in job_targets:
                 url_suffix = job[0]
                 display_name = job[1]
                 result, link = getBuildResult(url_suffix)
@@ -158,7 +179,7 @@ class MainPage(webapp2.RequestHandler):
                 }
                 build_jobs.append(result)
             target = {
-                'project': t,
+                'project': project,
                 'build_jobs': build_jobs
             }
             template_values['targets'].append(target)
@@ -172,8 +193,9 @@ class SnapshotPage(webapp2.RequestHandler):
 
     def get(self, target):
         snapshot_found = False
-        for t in sorted(TARGETS):
-            for j in TARGETS[t]:
+        for t in TARGETS:
+            job_targets = t[1:]
+            for j in job_targets:
                 if target == j[1]:
                     result, link = getBuildResult(j[0], True)
                     self.redirect(getSnapshot(link))
