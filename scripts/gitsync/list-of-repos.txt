@@ -84,6 +84,7 @@ netstack
 network
 network/benchmarks
 packages
+peridot
 playground/isolate-test
 pm
 rust_ledger_example
