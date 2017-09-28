@@ -58,7 +58,9 @@ TARGETS = [
         ('fuchsia/zircon-qemu-arm64-gcc', 'zircon-qemu-arm64-gcc'),
     ],
     [
-        ('jiri'),
+        ('web_view/jiri'),
+        ('fuchsia/web_view-x86_64-linux', 'web_view-x86_64-linux'),
+        ('fuchsia/web_view-aarch64-linux', 'web_view-aarch64-linux'),
         ('fuchsia/jiri-x86_64-linux', 'jiri-x86_64-linux'),
         ('fuchsia/jiri-x86_64-mac', 'jiri-x86_64-mac'),
     ]
