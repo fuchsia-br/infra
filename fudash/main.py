@@ -61,11 +61,6 @@ TARGETS = [
         ('jiri'),
         ('fuchsia/jiri-x86_64-linux', 'jiri-x86_64-linux'),
         ('fuchsia/jiri-x86_64-mac', 'jiri-x86_64-mac'),
-    ],
-    [
-        ('fyi'),
-        ('fuchsia/zircon-pc-x86-64-asan', 'zircon-pc-x86-64-asan'),
-        ('fuchsia/zircon-qemu-arm64-asan', 'zircon-qemu-arm64-asan'),
     ]
 ]
 
