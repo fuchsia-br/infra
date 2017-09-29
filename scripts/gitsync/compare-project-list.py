@@ -27,7 +27,7 @@ def main():
     projects = json.loads(r.text[5:])
     with open('list-of-repos.txt') as current_list:
         listed_projects = map(string.strip, current_list.readlines())
-    meta_projects = ['All-Projects', 'All-Users', 'gerrit/verified-projects']
+    meta_projects = ['All-Projects', 'All-Users', 'Read-Only', 'gerrit/verified-projects']
     project_diff = set(projects.keys()) - set(meta_projects) - set(listed_projects)
     if len(project_diff) != 0:
         print 'The following projects are not in list-of-repos.txt:'
