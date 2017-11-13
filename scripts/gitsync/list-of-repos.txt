@@ -47,6 +47,7 @@ playground/isolate-test
 pm
 scripts
 sysui
+topaz
 third_party/asio
 third_party/benchmark
 third_party/binutils-gdb
