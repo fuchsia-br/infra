@@ -23,13 +23,6 @@ SNAPSHOT_URL = 'https://storage.googleapis.com/fuchsia/jiri/snapshots'
 
 TARGETS = [
     [
-        ('fuchsia'),
-        ('fuchsia/fuchsia-aarch64-linux-debug', 'fuchsia-aarch64-linux-debug'),
-        ('fuchsia/fuchsia-aarch64-linux-release', 'fuchsia-aarch64-linux-release'),
-        ('fuchsia/fuchsia-x86_64-linux-debug', 'fuchsia-x86_64-linux-debug'),
-        ('fuchsia/fuchsia-x86_64-linux-release', 'fuchsia-x86_64-linux-release'),
-    ],
-    [
         ('topaz'),
         ('fuchsia/topaz-aarch64-linux-debug', 'topaz-aarch64-linux-debug'),
         ('fuchsia/topaz-aarch64-linux-release', 'topaz-aarch64-linux-release'),
