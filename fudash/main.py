@@ -56,6 +56,12 @@ TARGETS = [
         ('fuchsia/web_view-arm64-linux', 'web_view-arm64-linux'),
         ('fuchsia/jiri-x64-linux', 'jiri-x64-linux'),
         ('fuchsia/jiri-x64-mac', 'jiri-x64-mac'),
+    ],
+    [
+        ('rollers'),
+        ('fuchsia/zircon-roller', 'zircon-roller'),
+        ('fuchsia/garnet-roller', 'garnet-roller'),
+        ('fuchsia/peridot-roller', 'peridot-roller'),
     ]
 ]
 
